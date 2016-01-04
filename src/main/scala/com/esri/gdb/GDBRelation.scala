@@ -8,11 +8,7 @@ import org.apache.spark.sql.{Row, SQLContext}
 
 /**
   */
-case class GDBRelation(gdbPath: String,
-                       gdbName: String,
-                       serde: String,
-                       numPartition: Int
-                      )(@transient val sqlContext: SQLContext) extends BaseRelation with Logging with TableScan {
+case class GDBRelation(gdbPath: String, gdbName: String, numPartition: Int)(@transient val sqlContext: SQLContext) extends BaseRelation with Logging with TableScan {
 
   override val schema = inferSchema()
 
@@ -20,7 +16,7 @@ case class GDBRelation(gdbPath: String,
     val sc = sqlContext.sparkContext
     GDBTable.findTable(gdbPath, gdbName, sc.hadoopConfiguration) match {
       case Some(catTab) => {
-        val table = GDBTable(gdbPath, catTab.hexName, serde, sc.hadoopConfiguration)
+        val table = GDBTable(gdbPath, catTab.hexName, sc.hadoopConfiguration)
         try {
           table.schema()
         } finally {
@@ -35,6 +31,6 @@ case class GDBRelation(gdbPath: String,
   }
 
   override def buildScan(): RDD[Row] = {
-    GDBRDD(sqlContext.sparkContext, gdbPath, gdbName, serde, numPartition)
+    GDBRDD(sqlContext.sparkContext, gdbPath, gdbName, numPartition)
   }
 }

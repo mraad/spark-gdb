@@ -2,8 +2,8 @@ package com.esri.gdb
 
 import java.nio.ByteBuffer
 
-import com.esri.udt.{ShapeJTS, ShapeWKB, ShapeWKT}
-import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
+import com.esri.core.geometry.Polyline
+import com.esri.udt.ShapeEsri
 import org.apache.spark.sql.types.{DataType, Metadata}
 
 object FieldPolyline {
@@ -13,13 +13,8 @@ object FieldPolyline {
             yOrig: Double,
             xyScale: Double,
             xyTolerance: Double,
-            metadata: Metadata,
-            serde: String) = {
-    serde match {
-      case "wkt" => new FieldPolylineWKT(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-      case "wkb" => new FieldPolylineWKB(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-      case _ => new FieldPolylineJTS(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-    }
+            metadata: Metadata) = {
+    new FieldPolylineEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
   }
 }
 
@@ -34,9 +29,9 @@ abstract class FieldPolyline(name: String,
                             )
   extends FieldPoly(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
-  @transient val geomFact = new GeometryFactory(new PrecisionModel(1.0 / xyTolerance))
-
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
+    val polyline = new Polyline()
+
     val blob = getByteBuffer(byteBuffer)
     val geomType = blob getVarUInt
 
@@ -62,39 +57,27 @@ abstract class FieldPolyline(name: String,
         sum += numCoord
         numCoord
       })
-      geomFact.createMultiLineString(numCoordSeq.map(numCoord =>
-        geomFact.createLineString(getCoordinates(blob, numCoord))
-      ).toArray)
+      /*
+            geomFact.createMultiLineString(numCoordSeq.map(numCoord =>
+              geomFact.createLineString(getCoordinates(blob, numCoord))
+            ).toArray)
+      */
+      numCoordSeq.foreach(numCoord => addPath(blob, numCoord, polyline))
     }
     else {
-      geomFact.createLineString(getCoordinates(blob, numPoints))
+      // geomFact.createLineString(getCoordinates(blob, numPoints))
+      addPath(blob, numPoints, polyline)
     }
+    polyline
   }
 }
 
-class FieldPolylineJTS(name: String,
-                       nullValueAllowed: Boolean,
-                       xOrig: Double,
-                       yOrig: Double,
-                       xyScale: Double,
-                       xyTolerance: Double,
-                       metadata: Metadata
-                      ) extends FieldPolyline(name, ShapeJTS("polyline_jts"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+class FieldPolylineEsri(name: String,
+                        nullValueAllowed: Boolean,
+                        xOrig: Double,
+                        yOrig: Double,
+                        xyScale: Double,
+                        xyTolerance: Double,
+                        metadata: Metadata
+                       ) extends FieldPolyline(name, ShapeEsri("polyline"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
 
-class FieldPolylineWKT(name: String,
-                       nullValueAllowed: Boolean,
-                       xOrig: Double,
-                       yOrig: Double,
-                       xyScale: Double,
-                       xyTolerance: Double,
-                       metadata: Metadata
-                      ) extends FieldPolyline(name, ShapeWKT("polyline_wkt", xyTolerance), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-
-class FieldPolylineWKB(name: String,
-                       nullValueAllowed: Boolean,
-                       xOrig: Double,
-                       yOrig: Double,
-                       xyScale: Double,
-                       xyTolerance: Double,
-                       metadata: Metadata
-                      ) extends FieldPolyline(name, ShapeWKB("polyline_wkb", xyTolerance), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)

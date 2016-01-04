@@ -1,7 +1,7 @@
 package com.esri.gdb
 
+import com.esri.core.geometry.{Envelope2D, Point, Polygon, Polyline}
 import com.esri.udt.GeometryUDT
-import com.vividsolutions.jts.geom.Point
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -29,24 +29,8 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
 
   private val gdbPath = "src/test/resources/Test.gdb"
 
-  /*
-    test("Context") {
-      sc.gdbFile(gdbPath, "Points", numPartitions = 1).map(row => {
-        row.getAs[Geometry](row.fieldIndex("Shape")).buffer(10)
-      }).foreach(println)
-    }
-  */
-
-  test("JTS Points") {
-    doPoints(sqlContext.gdbFile(gdbPath, "Points", "jts", 2))
-  }
-
-  test("WKT Points") {
-    doPoints(sqlContext.gdbFile(gdbPath, "Points", "wkt", 2))
-  }
-
-  test("WKB Points") {
-    doPoints(sqlContext.gdbFile(gdbPath, "Points", "wkb", 2))
+  test("Points") {
+    doPoints(sqlContext.gdbFile(gdbPath, "Points", 2))
   }
 
   def doPoints(dataFrame: DataFrame): Unit = {
@@ -65,16 +49,8 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
     })
   }
 
-  test("JTS Lines") {
-    doLines(sqlContext.gdbFile(gdbPath, "Lines", "jts", 2))
-  }
-
-  test("WKB Lines") {
-    doLines(sqlContext.gdbFile(gdbPath, "Lines", "wkb", 2))
-  }
-
-  test("WKT Lines") {
-    doLines(sqlContext.gdbFile(gdbPath, "Lines", "wkt", 2))
+  test("Lines") {
+    doLines(sqlContext.gdbFile(gdbPath, "Lines", 2))
   }
 
   def doLines(dataFrame: DataFrame): Unit = {
@@ -87,7 +63,7 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       "RID",
       "OBJECTID")
     results.collect.foreach(row => {
-      val lineString = row.getAs[GeometryUDT](0).geometry
+      val lineString = row.getAs[GeometryUDT](0).geometry.asInstanceOf[Polyline]
       val x1 = row.getDouble(1)
       val y1 = row.getDouble(2)
       val x2 = row.getDouble(3)
@@ -97,31 +73,27 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       val rid = row.getInt(7)
       val oid = row.getInt(8)
 
-      val coords = lineString.getCoordinates
+      assert(lineString.getPointCount === 3)
 
-      assert((coords(0).x - x1).abs <= xyTolerance)
-      assert((coords(0).y - y1).abs <= xyTolerance)
+      val coord0 = lineString.getXY(0)
+      val coord1 = lineString.getXY(1)
+      val coord2 = lineString.getXY(2)
 
-      assert((coords(1).x - x2).abs <= xyTolerance)
-      assert((coords(1).y - y2).abs <= xyTolerance)
+      assert((coord0.x - x1).abs <= xyTolerance)
+      assert((coord0.y - y1).abs <= xyTolerance)
 
-      assert((coords(2).x - x3).abs <= xyTolerance)
-      assert((coords(2).y - y3).abs <= xyTolerance)
+      assert((coord1.x - x2).abs <= xyTolerance)
+      assert((coord1.y - y2).abs <= xyTolerance)
+
+      assert((coord2.x - x3).abs <= xyTolerance)
+      assert((coord2.y - y3).abs <= xyTolerance)
 
       assert(rid === oid)
     })
   }
 
   test("JTS Polygons") {
-    doPolygons(sqlContext.gdbFile(gdbPath, "Polygons", "jts", 2))
-  }
-
-  test("WKT Polygons") {
-    doPolygons(sqlContext.gdbFile(gdbPath, "Polygons", "wkt", 2))
-  }
-
-  test("WKB Polygons") {
-    doPolygons(sqlContext.gdbFile(gdbPath, "Polygons", "wkb", 2))
+    doPolygons(sqlContext.gdbFile(gdbPath, "Polygons", 2))
   }
 
   def doPolygons(dataFrame: DataFrame): Unit = {
@@ -133,7 +105,7 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       "RID",
       "OBJECTID")
     results.collect.foreach(row => {
-      val polygon = row.getAs[GeometryUDT](0).geometry
+      val polygon = row.getAs[GeometryUDT](0).geometry.asInstanceOf[Polygon]
       val x1 = row.getDouble(1)
       val y1 = row.getDouble(2)
       val x2 = row.getDouble(3)
@@ -141,13 +113,14 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       val rid = row.getInt(5)
       val oid = row.getInt(6)
 
-      val envp = polygon.getEnvelopeInternal
+      val envp = new Envelope2D()
+      polygon.queryEnvelope2D(envp)
 
-      assert((envp.getMinX - x1).abs <= xyTolerance)
-      assert((envp.getMinY - y1).abs <= xyTolerance)
+      assert((envp.xmin - x1).abs <= xyTolerance)
+      assert((envp.ymin - y1).abs <= xyTolerance)
 
-      assert((envp.getMaxX - x2).abs <= xyTolerance)
-      assert((envp.getMaxY - y2).abs <= xyTolerance)
+      assert((envp.xmax - x2).abs <= xyTolerance)
+      assert((envp.ymax - y2).abs <= xyTolerance)
 
       assert(rid === oid)
     })
@@ -165,7 +138,7 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
   }
 
   test("Field names, aliases and values") {
-    val dataframe = sqlContext.gdbFile(gdbPath, "Types", "jts", 2)
+    val dataframe = sqlContext.gdbFile(gdbPath, "Types", 2)
     val schema = dataframe.schema
 
     val fieldShape = schema("Shape")

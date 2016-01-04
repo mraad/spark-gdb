@@ -8,19 +8,14 @@ import org.apache.spark.{Logging, Partition, SparkContext, TaskContext}
 
 /**
   */
-case class GDBRDD(@transient sc: SparkContext,
-                  gdbPath: String,
-                  gdbName: String,
-                  serde: String,
-                  numPartitions: Int
-                 ) extends RDD[Row](sc, Nil) with Logging {
+case class GDBRDD(@transient sc: SparkContext, gdbPath: String, gdbName: String, numPartitions: Int) extends RDD[Row](sc, Nil) with Logging {
 
   @DeveloperApi
   override def compute(partition: Partition, context: TaskContext): Iterator[Row] = {
     val part = partition.asInstanceOf[GDBPartition]
     val hadoopConf = if (sc == null) new Configuration() else sc.hadoopConfiguration
     val index = GDBIndex(gdbPath, part.hexName, hadoopConf)
-    val table = GDBTable(gdbPath, part.hexName, serde, hadoopConf)
+    val table = GDBTable(gdbPath, part.hexName, hadoopConf)
     context.addTaskCompletionListener(context => {
       table.close()
       index.close()

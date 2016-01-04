@@ -1,11 +1,11 @@
 package com.esri.udt
 
-import com.vividsolutions.jts.geom.Geometry
+import com.esri.core.geometry.Geometry
 import org.apache.spark.sql.types._
 
 /**
   */
-class ShapeJTS(shapeName: String) extends UserDefinedType[GeometryUDT] {
+class ShapeEsri(shapeName: String) extends UserDefinedType[GeometryUDT] {
 
   override def typeName = shapeName
 
@@ -32,17 +32,17 @@ class ShapeJTS(shapeName: String) extends UserDefinedType[GeometryUDT] {
 
   override def equals(o: Any): Boolean = {
     o match {
-      case v: ShapeJTS => true
+      case v: ShapeEsri => true
       case _ => false
     }
   }
 
   // see [SPARK-8647], this achieves the needed constant hash code without constant no.
-  override def hashCode(): Int = classOf[ShapeJTS].getName.hashCode()
+  override def hashCode(): Int = classOf[ShapeEsri].getName.hashCode()
 
-  override def toString = s"ShapeJTS($shapeName)"
+  override def toString = s"ShapeEsri($shapeName)"
 }
 
-case object ShapeJTS {
-  def apply(shapeName: String) = new ShapeJTS(shapeName)
+case object ShapeEsri {
+  def apply(shapeName: String) = new ShapeEsri(shapeName)
 }

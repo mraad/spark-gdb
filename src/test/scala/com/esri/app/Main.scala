@@ -1,7 +1,6 @@
 package com.esri.app
 
-import com.esri.udt.GeometryUDT
-import com.vividsolutions.jts.geom.{Geometry, Point}
+import com.esri.core.geometry.Point
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{Logging, SparkConf, SparkContext}
 
@@ -27,16 +26,15 @@ object Main extends App with Logging {
     val df = sqlContext.read.format("com.esri.gdb")
       .option("path", path)
       .option("name", name)
-      .option("serde", "wkt")
       .option("numPartitions", "1")
       .load()
     df.printSchema()
     df.registerTempTable(name)
     sqlContext.udf.register("getX", (point: Point) => point.getX)
     sqlContext.udf.register("getY", (point: Point) => point.getY)
-    sqlContext.udf.register("buffer", (geom: Geometry, distance: Double) => GeometryUDT(geom.buffer(distance)))
+    // sqlContext.udf.register("buffer", (geom: Geometry, distance: Double) => GeometryUDT(geom.buffer(distance)))
     sqlContext
-      .sql(s"select buffer(Shape) from $name")
+      .sql(s"select Shape from $name")
       .show()
   } finally {
     sc.stop()

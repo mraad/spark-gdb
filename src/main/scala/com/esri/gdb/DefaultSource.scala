@@ -28,8 +28,7 @@ class DefaultSource extends RelationProvider with SchemaRelationProvider {
                              ): BaseRelation = {
     val path = parameters.getOrElse("path", sys.error("Parameter 'path' must be defined."))
     val name = parameters.getOrElse("name", sys.error("Parameter 'name' must be defined."))
-    val serde = parameters.getOrElse("serde", "jts")
     val numPartitions = parameters.getOrElse("numPartitions", "8").toInt
-    GDBRelation(path, name, serde, numPartitions)(sqlContext)
+    GDBRelation(path, name, numPartitions)(sqlContext)
   }
 }

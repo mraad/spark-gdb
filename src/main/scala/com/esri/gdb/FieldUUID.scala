@@ -2,12 +2,11 @@ package com.esri.gdb
 
 import java.nio.ByteBuffer
 
-import com.vividsolutions.jts.geom.GeometryFactory
 import org.apache.spark.sql.types.{Metadata, StringType}
 
 /**
   */
-class FieldUUID(name: String, nullValueAllowed: Boolean, metadata:Metadata)
+class FieldUUID(name: String, nullValueAllowed: Boolean, metadata: Metadata)
   extends Field(name, StringType, nullValueAllowed, metadata) {
 
   private val b = new Array[Byte](16)

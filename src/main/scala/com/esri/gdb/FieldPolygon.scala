@@ -2,8 +2,8 @@ package com.esri.gdb
 
 import java.nio.ByteBuffer
 
-import com.esri.udt.{ShapeJTS, ShapeWKB, ShapeWKT}
-import com.vividsolutions.jts.geom.{GeometryFactory, PrecisionModel}
+import com.esri.core.geometry.Polygon
+import com.esri.udt.ShapeEsri
 import org.apache.spark.sql.types.{DataType, Metadata}
 
 object FieldPolygon {
@@ -13,13 +13,8 @@ object FieldPolygon {
             yOrig: Double,
             xyScale: Double,
             xyTolerance: Double,
-            metadata: Metadata,
-            serde: String) = {
-    serde match {
-      case "wkt" => new FieldPolygonWKT(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-      case "wkb" => new FieldPolygonWKB(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-      case _ => new FieldPolygonJTS(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-    }
+            metadata: Metadata) = {
+    new FieldPolygonEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
   }
 }
 
@@ -34,9 +29,9 @@ abstract class FieldPolygon(name: String,
                            )
   extends FieldPoly(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
-  @transient val geomFact = new GeometryFactory(new PrecisionModel(1.0 / xyTolerance))
-
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
+    val polygon = new Polygon()
+
     val blob = getByteBuffer(byteBuffer)
 
     val geomType = blob getVarUInt
@@ -63,44 +58,31 @@ abstract class FieldPolygon(name: String,
         sum += numCoord
         numCoord
       })
-      val polygons = numCoordSeq.map(numCoord => {
-        val coordinates = getCoordinates(blob, numCoord)
-        geomFact.createLinearRing(coordinates)
-      })
+      /*
+            val polygons = numCoordSeq.map(numCoord => {
+              val coordinates = getCoordinates(blob, numCoord)
+              geomFact.createLinearRing(coordinates)
+            })
+            val shell = polygons.head
+            val holes = polygons.tail.toArray
+            geomFact.createPolygon(shell, holes)
+      */
       // TODO - fix shells and holes based on https://github.com/rouault/dump_gdbtable/wiki/FGDB-Spec
-      val shell = polygons.head
-      val holes = polygons.tail.toArray
-      geomFact.createPolygon(shell, holes)
+      numCoordSeq.foreach(numCoord => addPath(blob, numCoord, polygon))
     }
     else {
-      geomFact.createPolygon(getCoordinates(blob, numPoints))
+      // createPolygon(getCoordinates(blob, numPoints))
+      addPath(blob, numPoints, polygon)
     }
+    polygon
   }
 }
 
-class FieldPolygonJTS(name: String,
-                      nullValueAllowed: Boolean,
-                      xOrig: Double,
-                      yOrig: Double,
-                      xyScale: Double,
-                      xyTolerance: Double,
-                      metadata: Metadata
-                     ) extends FieldPolygon(name, ShapeJTS("polygon_jts"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-
-class FieldPolygonWKT(name: String,
-                      nullValueAllowed: Boolean,
-                      xOrig: Double,
-                      yOrig: Double,
-                      xyScale: Double,
-                      xyTolerance: Double,
-                      metadata: Metadata
-                     ) extends FieldPolygon(name, ShapeWKT("polygon_wkt", xyTolerance), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-
-class FieldPolygonWKB(name: String,
-                      nullValueAllowed: Boolean,
-                      xOrig: Double,
-                      yOrig: Double,
-                      xyScale: Double,
-                      xyTolerance: Double,
-                      metadata: Metadata
-                     ) extends FieldPolygon(name, ShapeWKB("polygon_wkb", xyTolerance), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+class FieldPolygonEsri(name: String,
+                       nullValueAllowed: Boolean,
+                       xOrig: Double,
+                       yOrig: Double,
+                       xyScale: Double,
+                       xyTolerance: Double,
+                       metadata: Metadata
+                      ) extends FieldPolygon(name, ShapeEsri("polygon"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)

@@ -9,7 +9,7 @@ There is still a lot to be done, but is a good start. Eventually, I will merge t
 
 ### TODO (not in specified order)
 
-* Use [Esri Geometry Library](https://github.com/Esri/geometry-api-java) rather than JTS (I love JTS, so many utility functions on they geometry model)
+* ~~Use [Esri Geometry Library](https://github.com/Esri/geometry-api-java) rather than JTS (I love JTS, so many utility functions on they geometry model)~~
 * Implement polylines and polygons as Spatial Type using UDT spec.
 * Handle more shapes - multiXXX and with Z and M
 * Read default values in field definitions
@@ -37,7 +37,7 @@ In the case of the `Points` feature class, the x/y coordinate values should matc
 ## Using with Spark shell
 
 ```bash
-$SPARK_HOME/bin/spark-shell --packages com.esri:spark-gdb:0.1
+$SPARK_HOME/bin/spark-shell --packages com.esri:spark-gdb:0.2
 ```
 
 ```scala
@@ -116,7 +116,7 @@ hadoop fs -put /Users/<YOUR_PATH>/spark-gdb/src/test/resources/Test.gdb /data
 
 Start A Spark shell:
 ```bash
-spark-shell --jars /Users/<YOUR_PATH>/spark-gdb/target/spark-gdb-0.1.jar
+spark-shell --jars /Users/<YOUR_PATH>/spark-gdb/target/spark-gdb-0.2.jar
 ```
 
 Submit a Spark Context job:

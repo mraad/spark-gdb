@@ -2,8 +2,8 @@ package com.esri.gdb
 
 import java.nio.ByteBuffer
 
-import com.esri.udt.{ShapeJTS, ShapeWKB, ShapeWKT}
-import com.vividsolutions.jts.geom.{Coordinate, GeometryFactory, PrecisionModel}
+import com.esri.core.geometry.Point
+import com.esri.udt.ShapeEsri
 import org.apache.spark.sql.types.{DataType, Metadata}
 
 object FieldPoint {
@@ -13,13 +13,8 @@ object FieldPoint {
             yOrig: Double,
             xyScale: Double,
             xyTolerance: Double,
-            metadata: Metadata,
-            serde: String) = {
-    serde match {
-      case "wkt" => new FieldPointWKT(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-      case "wkb" => new FieldPointWKB(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-      case _ => new FieldPointJTS(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-    }
+            metadata: Metadata) = {
+    new FieldPointEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
   }
 }
 
@@ -33,8 +28,6 @@ abstract class FieldPoint(name: String,
                           metadata: Metadata
                          ) extends FieldGeom(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
-  @transient val geomFact = new GeometryFactory(new PrecisionModel(1.0 / xyTolerance))
-
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)
 
@@ -45,37 +38,17 @@ abstract class FieldPoint(name: String,
     val x = (vx - 1.0) / xyScale + xOrig
     val y = (vy - 1.0) / xyScale + yOrig
 
-    geomFact.createPoint(new Coordinate(x, y))
+    new Point(x, y)
   }
 }
 
 
-class FieldPointJTS(name: String,
-                    nullValueAllowed: Boolean,
-                    xOrig: Double,
-                    yOrig: Double,
-                    xyScale: Double,
-                    xyTolerance: Double,
-                    metadata: Metadata
-                   )
-  extends FieldPoint(name, ShapeJTS("point_jts"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-
-class FieldPointWKT(name: String,
-                    nullValueAllowed: Boolean,
-                    xOrig: Double,
-                    yOrig: Double,
-                    xyScale: Double,
-                    xyTolerance: Double,
-                    metadata: Metadata
-                   )
-  extends FieldPoint(name, ShapeWKT("point_wkt", xyTolerance), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
-
-class FieldPointWKB(name: String,
-                    nullValueAllowed: Boolean,
-                    xOrig: Double,
-                    yOrig: Double,
-                    xyScale: Double,
-                    xyTolerance: Double,
-                    metadata: Metadata
-                   )
-  extends FieldPoint(name, ShapeWKB("point_wkb", xyTolerance), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+class FieldPointEsri(name: String,
+                     nullValueAllowed: Boolean,
+                     xOrig: Double,
+                     yOrig: Double,
+                     xyScale: Double,
+                     xyTolerance: Double,
+                     metadata: Metadata
+                    )
+  extends FieldPoint(name, ShapeEsri("point"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)

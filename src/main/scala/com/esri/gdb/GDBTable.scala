@@ -47,14 +47,10 @@ class GDBTable(dataBuffer: DataBuffer,
 
 object GDBTable {
   def apply(path: String, name: String): GDBTable = {
-    apply(path, name, null, new Configuration()) // TODO - Hate null here - implement as an Option
+    apply(path, name, new Configuration())
   }
 
   def apply(path: String, name: String, conf: Configuration): GDBTable = {
-    apply(path, name, null, conf)
-  }
-
-  def apply(path: String, name: String, serde: String, conf: Configuration) = {
     val filename = StringBuilder.newBuilder.append(path).append(File.separator).append(name).append(".gdbtable").toString()
     val hdfsPath = new Path(filename)
     val dataBuffer = DataBuffer(hdfsPath.getFileSystem(conf).open(hdfsPath))
@@ -92,7 +88,7 @@ object GDBTable {
         case EsriFieldType.DATETIME => toFieldDateTime(bb2, name, alias)
         case EsriFieldType.STRING => toFieldString(bb2, name, alias)
         case EsriFieldType.OID => toFieldOID(bb2, name, alias)
-        case EsriFieldType.SHAPE => toFieldGeom(bb2, name, alias, geometryType, serde)
+        case EsriFieldType.SHAPE => toFieldGeom(bb2, name, alias, geometryType)
         case EsriFieldType.BINARY => toFieldBinary(bb2, name, alias)
         case EsriFieldType.UUID | EsriFieldType.GUID => toFieldUUID(bb2, name, alias)
         case EsriFieldType.XML => toFieldXML(bb2, name, alias)
@@ -214,7 +210,7 @@ object GDBTable {
     new FieldOID(name, (flag & 1) == 1, metadata)
   }
 
-  private def toFieldGeom(bb: ByteBuffer, name: String, alias: String, geometryType: Byte, serde: String): Field = {
+  private def toFieldGeom(bb: ByteBuffer, name: String, alias: String, geometryType: Byte): Field = {
     val len = bb.get
     val flag = bb.get
     val nullAllowed = (flag & 1) == 1
@@ -281,11 +277,11 @@ object GDBTable {
     // TODO - more shapes, Z and M
     geometryType match {
       case 1 =>
-        FieldPoint(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata, serde)
+        FieldPoint(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
       case 3 =>
-        FieldPolyline(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata, serde)
+        FieldPolyline(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
       case 4 | 5 =>
-        FieldPolygon(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata, serde)
+        FieldPolygon(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
       case _ =>
         new FieldGeomNoop(name, nullAllowed)
     }

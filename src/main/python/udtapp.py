@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
         df = sqlContext.read \
             .format("com.esri.gdb") \
-            .options(path="../../test/resources/Test.gdb", name=gdb_name, numPartitions="1", serde="wkt") \
+            .options(path="../../test/resources/Test.gdb", name=gdb_name, numPartitions="1") \
             .load()
 
         df.printSchema()

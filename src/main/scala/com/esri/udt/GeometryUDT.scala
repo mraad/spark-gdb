@@ -1,9 +1,9 @@
 package com.esri.udt
 
-import com.vividsolutions.jts.geom.Geometry
+import com.esri.core.geometry.Geometry
 import org.apache.spark.sql.types.SQLUserDefinedType
 
 /**
   */
-@SQLUserDefinedType(udt = classOf[ShapeJTS])
+@SQLUserDefinedType(udt = classOf[ShapeEsri])
 case class GeometryUDT(val geometry: Geometry)

@@ -42,14 +42,14 @@ package object gdb {
   }
 
   implicit class SparkContextImplicits(sc: SparkContext) {
-    implicit def gdbFile(path: String, name: String, serde: String = null, numPartitions: Int = 8) = {
-      GDBRDD(sc, path, name, serde, numPartitions)
+    implicit def gdbFile(path: String, name: String, numPartitions: Int = 8) = {
+      GDBRDD(sc, path, name, numPartitions)
     }
   }
 
   implicit class SQLContextImplicits(sqlContext: SQLContext) extends Serializable {
-    implicit def gdbFile(path: String, name: String, serde: String = null, numPartitions: Int = 8) = {
-      sqlContext.baseRelationToDataFrame(GDBRelation(path, name, serde, numPartitions)(sqlContext))
+    implicit def gdbFile(path: String, name: String, numPartitions: Int = 8) = {
+      sqlContext.baseRelationToDataFrame(GDBRelation(path, name, numPartitions)(sqlContext))
     }
   }
 
