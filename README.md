@@ -131,7 +131,7 @@ docker-machine upgrade quickstart
 
 Set up the docker environment:
 ```bash
-$eval(docker-machine env quickstart)
+eval $(docker-machine env quickstart)
 ```
 
 Start a single node Hadoop instance with ZooKeeper, HDFS, YARN and Spark.
@@ -165,9 +165,9 @@ spark-shell --jars /Users/<YOUR_PATH>/spark-gdb/target/spark-gdb-0.2.jar
 Submit a Spark Context job:
 ```scala
 import com.esri.gdb._
-import com.vividsolutions.jts.geom.Geometry
+import com.esri.udt.PointType
 sc.gdbFile("hdfs:///data/Test.gdb", "Points", numPartitions = 2).map(row => {
-  row.getAs[Geometry](row.fieldIndex("Shape")).buffer(1)
+  row.getAs[PointType](row.fieldIndex("Shape"))
 }).foreach(println)
 ```
 

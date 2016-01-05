@@ -92,7 +92,7 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
     })
   }
 
-  test("JTS Polygons") {
+  test("Polygons") {
     doPolygons(sqlContext.gdbFile(gdbPath, "Polygons", 2))
   }
 
