@@ -2,8 +2,7 @@ package com.esri.gdb
 
 import java.nio.ByteBuffer
 
-import com.esri.core.geometry.Point
-import com.esri.udt.ShapeEsri
+import com.esri.udt.{PointType, PointUDT}
 import org.apache.spark.sql.types.{DataType, Metadata}
 
 object FieldPoint {
@@ -38,7 +37,7 @@ abstract class FieldPoint(name: String,
     val x = (vx - 1.0) / xyScale + xOrig
     val y = (vy - 1.0) / xyScale + yOrig
 
-    new Point(x, y)
+    new PointType(x, y)
   }
 }
 
@@ -51,4 +50,4 @@ class FieldPointEsri(name: String,
                      xyTolerance: Double,
                      metadata: Metadata
                     )
-  extends FieldPoint(name, ShapeEsri("point"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+  extends FieldPoint(name, new PointUDT(), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)

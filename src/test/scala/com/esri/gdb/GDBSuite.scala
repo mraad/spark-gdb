@@ -1,7 +1,7 @@
 package com.esri.gdb
 
-import com.esri.core.geometry.{Envelope2D, Point, Polygon, Polyline}
-import com.esri.udt.GeometryUDT
+import com.esri.core.geometry.{Envelope2D, Polygon, Polyline}
+import com.esri.udt.{GeometryUDT, PointType}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -38,13 +38,13 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
 
     val results = dataFrame.select("Shape", "X", "Y", "RID", "OBJECTID")
     results.collect.foreach(row => {
-      val point = row.getAs[GeometryUDT](0).geometry.asInstanceOf[Point]
+      val point = row.getAs[PointType](0)
       val x = row.getDouble(1)
       val y = row.getDouble(2)
       val rid = row.getInt(3)
       val oid = row.getInt(4)
-      assert((point.getX - x).abs <= xyTolerance)
-      assert((point.getY - y).abs <= xyTolerance)
+      assert((point.x - x).abs <= xyTolerance)
+      assert((point.y - y).abs <= xyTolerance)
       assert(rid === oid)
     })
   }
@@ -179,9 +179,9 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       .collect()
       .head
 
-    val point = row.getAs[GeometryUDT](0).geometry.asInstanceOf[Point]
-    assert((point.getX - 33.8869).abs < 0.00001)
-    assert((point.getY - 35.5131).abs < 0.00001)
+    val point = row.getAs[PointType](0)
+    assert((point.x - 33.8869).abs < 0.00001)
+    assert((point.y - 35.5131).abs < 0.00001)
 
     assert(row.getString(1) === "Beirut")
 

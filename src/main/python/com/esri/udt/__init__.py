@@ -1,9 +1,8 @@
-__all__ = ['ShapeWKT']
+__all__ = ['PointType']
 
 import array
 import sys
-from pyspark.sql.types import UserDefinedType, StringType
-from shapely import geos
+from pyspark.sql.types import UserDefinedType, StructField, StructType, DoubleType
 
 #
 # copied from Spark VectorUDT
@@ -26,14 +25,13 @@ if sys.version_info[:2] == (2, 7):
     copy_reg.pickle(array.array, fast_pickle_array)
 
 
-class ShapeWKT(UserDefinedType):
-    def __init__(self):
-        self.writer = geos.WKTWriter(geos.lgeos)
-        self.reader = geos.WKTReader(geos.lgeos)
-
+class PointUDT(UserDefinedType):
     @classmethod
     def sqlType(self):
-        return StringType()
+        return StructType([
+            StructField("x", DoubleType(), False),
+            StructField("y", DoubleType(), False)
+        ])
 
     @classmethod
     def module(cls):
@@ -41,13 +39,30 @@ class ShapeWKT(UserDefinedType):
 
     @classmethod
     def scalaUDT(cls):
-        return "com.esri.udt.ShapeWKT"
+        return "com.esri.udt.PointUDT"
 
     def serialize(self, obj):
-        return self.writer.write(obj)
+        return (obj.x, obj.y)
 
     def deserialize(self, datum):
-        return self.reader.read(datum)
+        return PointType(datum[0], datum[1])
 
     def simpleString(self):
-        return "shapewkt"
+        return "point"
+
+class PointType(object):
+    __UDT__ = PointUDT()
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return "PointType(%s,%s)" % (self.x, self.y)
+
+    def __str__(self):
+        return "(%s,%s)" % (self.x, self.y)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and \
+               other.x == self.x and other.y == self.y

@@ -7,11 +7,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, Path}
 
 object GDBIndex {
-  def apply(path: String, name: String): GDBIndex = {
-    apply(path, name, new Configuration())
-  }
-
-  def apply(path: String, name: String, conf: Configuration): GDBIndex = {
+  def apply(path: String, name: String, conf: Configuration = new Configuration()) = {
     val filename = StringBuilder.newBuilder.append(path).append(File.separator).append(name).append(".gdbtablx").toString()
     val hdfsPath = new Path(filename)
     val dataInput = hdfsPath.getFileSystem(conf).open(hdfsPath)

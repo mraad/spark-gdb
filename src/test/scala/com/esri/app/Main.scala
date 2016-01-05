@@ -1,6 +1,6 @@
 package com.esri.app
 
-import com.esri.core.geometry.Point
+import com.esri.udt.PointType
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{Logging, SparkConf, SparkContext}
 
@@ -30,12 +30,18 @@ object Main extends App with Logging {
       .load()
     df.printSchema()
     df.registerTempTable(name)
-    sqlContext.udf.register("getX", (point: Point) => point.getX)
-    sqlContext.udf.register("getY", (point: Point) => point.getY)
-    // sqlContext.udf.register("buffer", (geom: Geometry, distance: Double) => GeometryUDT(geom.buffer(distance)))
-    sqlContext
-      .sql(s"select Shape from $name")
-      .show()
+    sqlContext.udf.register("getX", (point: PointType) => point.x)
+    sqlContext.udf.register("getY", (point: PointType) => point.y)
+    sqlContext.udf.register("plus2", (point: PointType) => PointType(point.x + 2, point.y + 2))
+    // df.select("OBJECTID", "X", "Y", "Shape")
+    sqlContext.sql(s"select getX(plus2(Shape)),getX(Shape) as y from $name")
+      .show(20)
+    /*
+          .write
+          .mode(SaveMode.Overwrite)
+          .format("json")
+          .save(s"/tmp/$name.json")
+    */
   } finally {
     sc.stop()
   }

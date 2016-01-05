@@ -46,11 +46,7 @@ class GDBTable(dataBuffer: DataBuffer,
 }
 
 object GDBTable {
-  def apply(path: String, name: String): GDBTable = {
-    apply(path, name, new Configuration())
-  }
-
-  def apply(path: String, name: String, conf: Configuration): GDBTable = {
+  def apply(path: String, name: String, conf: Configuration = new Configuration()) = {
     val filename = StringBuilder.newBuilder.append(path).append(File.separator).append(name).append(".gdbtable").toString()
     val hdfsPath = new Path(filename)
     val dataBuffer = DataBuffer(hdfsPath.getFileSystem(conf).open(hdfsPath))
