@@ -61,6 +61,8 @@ sqlContext.sql(s"select * from points").show()
 
 ### Using UDT and UDFs
 
+For the Spatial UDT (User Defined Types), I am following the `VectorUDT` implementation.
+
 In Scala:
 
 ```scala
@@ -106,7 +108,7 @@ for row in rows.collect():
 
 We will use [Docker](https://www.docker.com/) to bootstrap a [Cloudera quickstart](https://www.cloudera.com/content/www/en-us/documentation/enterprise/latest/topics/quickstart_docker_container.html) container instance.
 
-*Note*: I _highly_ recommend the installation of the [Docker Toolbox](https://www.docker.com/docker-toolbox) for a quickstart.
+I **highly** recommend the installation of the [Docker Toolbox](https://www.docker.com/docker-toolbox) for a Docker quick start.
 
 Compile the project with the `quickstart` profile:
 ```bash

@@ -273,11 +273,11 @@ object GDBTable {
     // TODO - more shapes, Z and M
     geometryType match {
       case 1 =>
-        FieldPoint(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+        FieldPoint(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
       case 3 =>
-        FieldPolyline(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+        FieldPolyline(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
       case 4 | 5 =>
-        FieldPolygon(name, nullAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+        FieldPolygon(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
       case _ =>
         new FieldGeomNoop(name, nullAllowed)
     }

@@ -12,9 +12,8 @@ object FieldPolyline {
             xOrig: Double,
             yOrig: Double,
             xyScale: Double,
-            xyTolerance: Double,
             metadata: Metadata) = {
-    new FieldPolylineEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+    new FieldPolylineEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, metadata)
   }
 }
 
@@ -24,7 +23,6 @@ abstract class FieldPolyline(name: String,
                              xOrig: Double,
                              yOrig: Double,
                              xyScale: Double,
-                             xyTolerance: Double,
                              metadata: Metadata
                             )
   extends FieldPoly(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
@@ -77,7 +75,6 @@ class FieldPolylineEsri(name: String,
                         xOrig: Double,
                         yOrig: Double,
                         xyScale: Double,
-                        xyTolerance: Double,
                         metadata: Metadata
-                       ) extends FieldPolyline(name, ShapeEsri("polyline"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+                       ) extends FieldPolyline(name, ShapeEsri("polyline"), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
 

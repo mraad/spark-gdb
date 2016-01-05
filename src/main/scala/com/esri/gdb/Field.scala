@@ -17,15 +17,4 @@ abstract class Field(name: String,
   def readTuple(byteBuffer: ByteBuffer, oid: Int) = {
     name -> readValue(byteBuffer, oid)
   }
-
-  /*
-    override def toString() = {
-      new StringBuilder(this.getClass.getSimpleName)
-        .append("{name='")
-        .append(name)
-        .append(",nullValueAllowed=")
-        .append(nullValueAllowed)
-        .toString()
-    }
-  */
 }

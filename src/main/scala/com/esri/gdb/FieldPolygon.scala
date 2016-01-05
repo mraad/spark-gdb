@@ -12,9 +12,8 @@ object FieldPolygon {
             xOrig: Double,
             yOrig: Double,
             xyScale: Double,
-            xyTolerance: Double,
             metadata: Metadata) = {
-    new FieldPolygonEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+    new FieldPolygonEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, metadata)
   }
 }
 
@@ -24,7 +23,6 @@ abstract class FieldPolygon(name: String,
                             xOrig: Double,
                             yOrig: Double,
                             xyScale: Double,
-                            xyTolerance: Double,
                             metadata: Metadata
                            )
   extends FieldPoly(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
@@ -83,6 +81,5 @@ class FieldPolygonEsri(name: String,
                        xOrig: Double,
                        yOrig: Double,
                        xyScale: Double,
-                       xyTolerance: Double,
                        metadata: Metadata
-                      ) extends FieldPolygon(name, ShapeEsri("polygon"), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+                      ) extends FieldPolygon(name, ShapeEsri("polygon"), nullValueAllowed, xOrig, yOrig, xyScale, metadata)

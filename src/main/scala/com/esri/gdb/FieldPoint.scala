@@ -11,21 +11,12 @@ object FieldPoint {
             xOrig: Double,
             yOrig: Double,
             xyScale: Double,
-            xyTolerance: Double,
             metadata: Metadata) = {
-    new FieldPointEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+    new FieldPointEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, metadata)
   }
 }
 
-abstract class FieldPoint(name: String,
-                          dataType: DataType,
-                          nullValueAllowed: Boolean,
-                          xOrig: Double,
-                          yOrig: Double,
-                          xyScale: Double,
-                          xyTolerance: Double,
-                          metadata: Metadata
-                         ) extends FieldGeom(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
+abstract class FieldPoint(name: String, dataType: DataType, nullValueAllowed: Boolean, xOrig: Double, yOrig: Double, xyScale: Double, metadata: Metadata) extends FieldGeom(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)
@@ -42,12 +33,5 @@ abstract class FieldPoint(name: String,
 }
 
 
-class FieldPointEsri(name: String,
-                     nullValueAllowed: Boolean,
-                     xOrig: Double,
-                     yOrig: Double,
-                     xyScale: Double,
-                     xyTolerance: Double,
-                     metadata: Metadata
-                    )
-  extends FieldPoint(name, new PointUDT(), nullValueAllowed, xOrig, yOrig, xyScale, xyTolerance, metadata)
+class FieldPointEsri(name: String, nullValueAllowed: Boolean, xOrig: Double, yOrig: Double, xyScale: Double, metadata: Metadata)
+  extends FieldPoint(name, new PointUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
