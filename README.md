@@ -10,7 +10,7 @@ There is still a lot to be done, but is a good start. Eventually, I will merge t
 ### TODO (not in specified order)
 
 * ~~Use [Esri Geometry Library](https://github.com/Esri/geometry-api-java) rather than JTS (I love JTS, so many utility functions on they geometry model)~~
-* Implement polylines and polygons as Spatial Type using UDT spec.
+* Implement ~~Point~~, Polyline and Polygon as Spatial Type using UDT spec.
 * Handle more shapes - multiXXX and with Z and M
 * Read default values in field definitions
 * Register custom [Kryo](https://github.com/EsotericSoftware/kryo) serializer for shapes (optimization - but worth it :-)
@@ -57,6 +57,49 @@ val df = sqlContext.read.
 df.printSchema()
 df.registerTempTable("points")
 sqlContext.sql(s"select * from points").show()
+```
+
+### Using UDT and UDFs
+
+In Scala:
+
+```scala
+val df = sqlContext.read.format("com.esri.gdb")
+  .option("path", path)
+  .option("name", name)
+  .option("numPartitions", "1")
+  .load()
+
+df.printSchema()
+df.registerTempTable(name)
+
+sqlContext.udf.register("getX", (point: PointType) => point.x)
+sqlContext.udf.register("getY", (point: PointType) => point.y)
+sqlContext.udf.register("plus2", (point: PointType) => PointType(point.x + 2, point.y + 2))
+
+sqlContext.sql(s"select getX(plus2(Shape)),getX(Shape) as y from $name")
+  .show(20)
+```
+
+In Python:
+
+```python
+df = sqlContext.read \
+    .format("com.esri.gdb") \
+    .options(path="../../test/resources/Test.gdb", name=gdb_name, numPartitions="1") \
+    .load()
+
+df.printSchema()
+
+df.registerTempTable(gdb_name)
+
+sqlContext.registerFunction("getX", lambda p: p.x, DoubleType())
+sqlContext.registerFunction("getY", lambda p: p.y, DoubleType())
+sqlContext.registerFunction("plus2", lambda p: PointType(p.x + 2, p.y + 2), PointUDT())
+
+rows = sqlContext.sql("select plus2(Shape),X,Y from {}".format(gdb_name))
+for row in rows.collect():
+    print row
 ```
 
 ## Testing In HDFS (Yet Another Excuse To Use Docker :-)
