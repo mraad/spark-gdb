@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-#  --packages com.vividsolutions:jts:1.14\
 spark-submit\
  --master "local[*]"\
  --driver-memory 1G\

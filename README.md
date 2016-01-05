@@ -42,9 +42,9 @@ $SPARK_HOME/bin/spark-shell --packages com.esri:spark-gdb:0.2
 
 ```scala
 import com.esri.gdb._
-import com.vividsolutions.jts.geom.Geometry
+import com.esri.udt._
 sc.gdbFile("src/test/resources/Test.gdb", "Points", numPartitions = 2).map(row => {
-  row.getAs[Geometry](row.fieldIndex("Shape")).buffer(1)
+  row.getAs[PointType](row.fieldIndex("Shape"))
 }).foreach(println)
 ```
 

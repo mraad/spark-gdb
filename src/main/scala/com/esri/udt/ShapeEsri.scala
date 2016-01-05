@@ -9,8 +9,6 @@ class ShapeEsri(shapeName: String) extends UserDefinedType[GeometryUDT] {
 
   override def typeName = shapeName
 
-  // override def pyUDT = "com.esri.udt.ShapeJTS"
-
   override def userClass = classOf[GeometryUDT]
 
   override def asNullable = this
