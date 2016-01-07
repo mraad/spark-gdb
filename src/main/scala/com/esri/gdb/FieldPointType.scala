@@ -3,20 +3,26 @@ package com.esri.gdb
 import java.nio.ByteBuffer
 
 import com.esri.udt.{PointType, PointUDT}
-import org.apache.spark.sql.types.{DataType, Metadata}
+import org.apache.spark.sql.types.Metadata
 
-object FieldPoint {
+object FieldPointType extends Serializable {
   def apply(name: String,
             nullValueAllowed: Boolean,
             xOrig: Double,
             yOrig: Double,
             xyScale: Double,
             metadata: Metadata) = {
-    new FieldPointEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, metadata)
+    new FieldPointType(name, nullValueAllowed, xOrig, yOrig, xyScale, metadata)
   }
 }
 
-abstract class FieldPoint(name: String, dataType: DataType, nullValueAllowed: Boolean, xOrig: Double, yOrig: Double, xyScale: Double, metadata: Metadata) extends FieldGeom(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
+class FieldPointType(name: String,
+                     nullValueAllowed: Boolean,
+                     xOrig: Double,
+                     yOrig: Double,
+                     xyScale: Double,
+                     metadata: Metadata)
+  extends FieldGeom(name, new PointUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)
@@ -32,6 +38,8 @@ abstract class FieldPoint(name: String, dataType: DataType, nullValueAllowed: Bo
   }
 }
 
-
+/*
+@deprecated
 class FieldPointEsri(name: String, nullValueAllowed: Boolean, xOrig: Double, yOrig: Double, xyScale: Double, metadata: Metadata)
   extends FieldPoint(name, new PointUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
+*/

@@ -5,6 +5,7 @@ import org.apache.spark.sql.types._
 
 /**
   */
+@deprecated
 class ShapeEsri(shapeName: String) extends UserDefinedType[GeometryUDT] {
 
   override def typeName = shapeName

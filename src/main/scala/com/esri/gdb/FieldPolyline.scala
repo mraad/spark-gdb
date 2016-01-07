@@ -6,7 +6,7 @@ import com.esri.core.geometry.Polyline
 import com.esri.udt.ShapeEsri
 import org.apache.spark.sql.types.{DataType, Metadata}
 
-object FieldPolyline {
+object FieldPolyline extends Serializable {
   def apply(name: String,
             nullValueAllowed: Boolean,
             xOrig: Double,
@@ -55,15 +55,9 @@ abstract class FieldPolyline(name: String,
         sum += numCoord
         numCoord
       })
-      /*
-            geomFact.createMultiLineString(numCoordSeq.map(numCoord =>
-              geomFact.createLineString(getCoordinates(blob, numCoord))
-            ).toArray)
-      */
       numCoordSeq.foreach(numCoord => addPath(blob, numCoord, polyline))
     }
     else {
-      // geomFact.createLineString(getCoordinates(blob, numPoints))
       addPath(blob, numPoints, polyline)
     }
     polyline
@@ -76,5 +70,6 @@ class FieldPolylineEsri(name: String,
                         yOrig: Double,
                         xyScale: Double,
                         metadata: Metadata
-                       ) extends FieldPolyline(name, ShapeEsri("polyline"), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
+                       )
+  extends FieldPolyline(name, ShapeEsri("polyline"), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
 

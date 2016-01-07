@@ -12,6 +12,4 @@ abstract class FieldGeom(name: String,
                          xyscale: Double,
                          metadata: Metadata
                         )
-  extends FieldBytes(name, dataType, nullValueAllowed, metadata) {
-
-}
+  extends FieldBytes(name, dataType, nullValueAllowed, metadata)

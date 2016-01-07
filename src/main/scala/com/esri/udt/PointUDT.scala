@@ -15,10 +15,10 @@ class PointUDT extends UserDefinedType[PointType] {
 
   override def serialize(obj: Any): InternalRow = {
     obj match {
-      case p: PointType => {
+      case PointType(x, y) => {
         val row = new GenericMutableRow(2)
-        row.setDouble(0, p.x)
-        row.setDouble(1, p.y)
+        row.setDouble(0, x)
+        row.setDouble(1, y)
         row
       }
     }

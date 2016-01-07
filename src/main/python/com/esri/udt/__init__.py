@@ -1,11 +1,11 @@
-__all__ = ['PointType']
+__all__ = ['PointType', 'PolylineType']
 
 import array
 import sys
-from pyspark.sql.types import UserDefinedType, StructField, StructType, DoubleType
+from pyspark.sql.types import UserDefinedType, StructField, StructType, DoubleType, IntegerType, ArrayType
 
 #
-# copied from Spark VectorUDT
+# Copied from Spark VectorUDT
 #
 if sys.version >= '3':
     basestring = str
@@ -26,6 +26,10 @@ if sys.version_info[:2] == (2, 7):
 
 
 class PointUDT(UserDefinedType):
+    """
+    SQL user-defined type (UDT) for Point.
+    """
+
     @classmethod
     def sqlType(self):
         return StructType([
@@ -42,13 +46,14 @@ class PointUDT(UserDefinedType):
         return "com.esri.udt.PointUDT"
 
     def serialize(self, obj):
-        return (obj.x, obj.y)
+        return obj.x, obj.y
 
     def deserialize(self, datum):
         return PointType(datum[0], datum[1])
 
     def simpleString(self):
         return "point"
+
 
 class PointType(object):
     __UDT__ = PointUDT()
@@ -58,7 +63,7 @@ class PointType(object):
         self.y = y
 
     def __repr__(self):
-        return "PointType(%s,%s)" % (self.x, self.y)
+        return "PointType({},{})".format(self.x, self.y)
 
     def __str__(self):
         return "(%s,%s)" % (self.x, self.y)
@@ -66,3 +71,61 @@ class PointType(object):
     def __eq__(self, other):
         return isinstance(other, self.__class__) and \
                other.x == self.x and other.y == self.y
+
+
+class PolylineUDT(UserDefinedType):
+    """
+    SQL user-defined type (UDT) for Polyline.
+    """
+
+    @classmethod
+    def sqlType(cls):
+        return StructType([
+            StructField("xmin", DoubleType(), False),
+            StructField("ymin", DoubleType(), False),
+            StructField("xmax", DoubleType(), False),
+            StructField("ymax", DoubleType(), False),
+            StructField("xyNum", ArrayType(IntegerType(), False), False),
+            StructField("xyArr", ArrayType(DoubleType(), False), False)])
+
+    @classmethod
+    def module(cls):
+        return "com.esri.udt"
+
+    @classmethod
+    def scalaUDT(cls):
+        return "com.esri.udt.PolylineUDT"
+
+    def serialize(self, obj):
+        xyNum = [int(i) for i in obj.xyNum]
+        xyArr = [float(v) for v in obj.xyArr]
+        return obj.xmin, obj.ymin, obj.xmax, obj.ymax, xyNum, xyArr
+
+    def deserialize(self, datum):
+        return PolylineType(datum[0], datum[1], datum[2], datum[3], datum[4], datum[5])
+
+    def simpleString(self):
+        return "polyline"
+
+
+class PolylineType(object):
+    __UDT__ = PolylineUDT()
+
+    def __init__(self, xmin, ymin, xmax, ymax, xyNum, xyArr):
+        self.xmin = xmin
+        self.ymin = ymin
+        self.xmax = xmax
+        self.ymax = ymax
+        self.xyNum = xyNum
+        self.xyArr = xyArr
+
+    def __repr__(self):
+        return "PolylineType({},{},{},{})".format(self.xmin, self.ymin, self.xmax, self.ymax)
+
+    def __str__(self):
+        return "({},{},{},{})".format(self.xmin, self.ymin, self.xmax, self.ymax)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and \
+               other.xmin == self.xmin and other.ymin == self.ymin and \
+               other.xmax == self.xmax and other.ymax == self.ymax

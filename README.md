@@ -9,12 +9,15 @@ There is still a lot to be done, but is a good start. Eventually, I will merge t
 
 ### TODO (not in specified order)
 
+Update (Jan 7 2016) - for Polylines and Polygons, I'm mimicking the core Spark Vector class. In a way, they have almost the same semantics.
+
 * ~~Use [Esri Geometry Library](https://github.com/Esri/geometry-api-java) rather than JTS (I love JTS, so many utility functions on they geometry model)~~
-* Implement ~~Point~~, Polyline and Polygon as Spatial Type using UDT spec.
+* Implement ~~Point~~, ~~Polyline~~ and Polygon as Spatial Type using UDT spec.
 * Handle more shapes - multiXXX and with Z and M
 * Read default values in field definitions
 * Register custom [Kryo](https://github.com/EsotericSoftware/kryo) serializer for shapes (optimization - but worth it :-)
 * Perform a scan rather than a seek if the index row count is the same as the table count (should help performance)
+* Test Multi part geometries
 * Test XML field type
 * Test Blob field type
 * Handle Raster (super low priority)
@@ -148,6 +151,8 @@ docker run\
  -p 7180:7180\
  -p 8888:8888\
  -p 50070:50070\
+ -p 50075:50075\
+ -p 21050:21050\
  -t -i cloudera/quickstart:latest\
  /usr/bin/docker-quickstart
 ```

@@ -4,3 +4,4 @@
 ss-*.sh
 target/
 dependency-reduced-pom.xml
+derby.log

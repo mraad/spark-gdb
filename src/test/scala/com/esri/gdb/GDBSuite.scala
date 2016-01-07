@@ -1,7 +1,7 @@
 package com.esri.gdb
 
-import com.esri.core.geometry.{Envelope2D, Polygon, Polyline}
-import com.esri.udt.{GeometryUDT, PointType}
+import com.esri.core.geometry.{Envelope2D, Polygon}
+import com.esri.udt.{GeometryUDT, PointType, PolylineType}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -63,7 +63,7 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       "RID",
       "OBJECTID")
     results.collect.foreach(row => {
-      val lineString = row.getAs[GeometryUDT](0).geometry.asInstanceOf[Polyline]
+      val polyline = row.getAs[PolylineType](0)
       val x1 = row.getDouble(1)
       val y1 = row.getDouble(2)
       val x2 = row.getDouble(3)
@@ -73,20 +73,19 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       val rid = row.getInt(7)
       val oid = row.getInt(8)
 
-      assert(lineString.getPointCount === 3)
+      assert(polyline.xyNum.length === 1)
+      assert(polyline.xyNum(0) === 3)
 
-      val coord0 = lineString.getXY(0)
-      val coord1 = lineString.getXY(1)
-      val coord2 = lineString.getXY(2)
+      assert(polyline.xyArr.length === 6)
 
-      assert((coord0.x - x1).abs <= xyTolerance)
-      assert((coord0.y - y1).abs <= xyTolerance)
+      assert((polyline.xyArr(0) - x1).abs <= xyTolerance)
+      assert((polyline.xyArr(1) - y1).abs <= xyTolerance)
 
-      assert((coord1.x - x2).abs <= xyTolerance)
-      assert((coord1.y - y2).abs <= xyTolerance)
+      assert((polyline.xyArr(2) - x2).abs <= xyTolerance)
+      assert((polyline.xyArr(3) - y2).abs <= xyTolerance)
 
-      assert((coord2.x - x3).abs <= xyTolerance)
-      assert((coord2.y - y3).abs <= xyTolerance)
+      assert((polyline.xyArr(4) - x3).abs <= xyTolerance)
+      assert((polyline.xyArr(5) - y3).abs <= xyTolerance)
 
       assert(rid === oid)
     })
