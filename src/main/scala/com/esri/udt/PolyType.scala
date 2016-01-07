@@ -23,5 +23,5 @@ abstract class PolyType(val xmin: Double,
     })
   }
 
-  override def toString = s"${getClass.getName}($xyArr)"
+  override def toString = "%s%s".format(getClass.getSimpleName, xyArr.mkString("(", ",", ")"))
 }
