@@ -3,7 +3,7 @@ package com.esri.gdb
 import java.nio.ByteBuffer
 
 import com.esri.core.geometry.Polygon
-import com.esri.udt.ShapeEsri
+import com.esri.udt.PolygonUDT
 import org.apache.spark.sql.types.{DataType, Metadata}
 
 object FieldPolygon {
@@ -56,15 +56,6 @@ abstract class FieldPolygon(name: String,
         sum += numCoord
         numCoord
       })
-      /*
-            val polygons = numCoordSeq.map(numCoord => {
-              val coordinates = getCoordinates(blob, numCoord)
-              geomFact.createLinearRing(coordinates)
-            })
-            val shell = polygons.head
-            val holes = polygons.tail.toArray
-            geomFact.createPolygon(shell, holes)
-      */
       // TODO - fix shells and holes based on https://github.com/rouault/dump_gdbtable/wiki/FGDB-Spec
       numCoordSeq.foreach(numCoord => addPath(blob, numCoord, polygon))
     }
@@ -82,4 +73,4 @@ class FieldPolygonEsri(name: String,
                        yOrig: Double,
                        xyScale: Double,
                        metadata: Metadata
-                      ) extends FieldPolygon(name, ShapeEsri("polygon"), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
+                      ) extends FieldPolygon(name, new PolygonUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata)

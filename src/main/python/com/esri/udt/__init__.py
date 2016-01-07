@@ -66,7 +66,7 @@ class PointType(object):
         return "PointType({},{})".format(self.x, self.y)
 
     def __str__(self):
-        return "(%s,%s)" % (self.x, self.y)
+        return "({},{})".format(self.x, self.y)
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and \
@@ -121,6 +121,64 @@ class PolylineType(object):
 
     def __repr__(self):
         return "PolylineType({},{},{},{})".format(self.xmin, self.ymin, self.xmax, self.ymax)
+
+    def __str__(self):
+        return "({},{},{},{})".format(self.xmin, self.ymin, self.xmax, self.ymax)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and \
+               other.xmin == self.xmin and other.ymin == self.ymin and \
+               other.xmax == self.xmax and other.ymax == self.ymax
+
+
+class PolygonUDT(UserDefinedType):
+    """
+    SQL user-defined type (UDT) for Polygon.
+    """
+
+    @classmethod
+    def sqlType(cls):
+        return StructType([
+            StructField("xmin", DoubleType(), False),
+            StructField("ymin", DoubleType(), False),
+            StructField("xmax", DoubleType(), False),
+            StructField("ymax", DoubleType(), False),
+            StructField("xyNum", ArrayType(IntegerType(), False), False),
+            StructField("xyArr", ArrayType(DoubleType(), False), False)])
+
+    @classmethod
+    def module(cls):
+        return "com.esri.udt"
+
+    @classmethod
+    def scalaUDT(cls):
+        return "com.esri.udt.PolygonUDT"
+
+    def serialize(self, obj):
+        xyNum = [int(i) for i in obj.xyNum]
+        xyArr = [float(v) for v in obj.xyArr]
+        return obj.xmin, obj.ymin, obj.xmax, obj.ymax, xyNum, xyArr
+
+    def deserialize(self, datum):
+        return PolygonType(datum[0], datum[1], datum[2], datum[3], datum[4], datum[5])
+
+    def simpleString(self):
+        return "polygon"
+
+
+class PolygonType(object):
+    __UDT__ = PolygonUDT()
+
+    def __init__(self, xmin, ymin, xmax, ymax, xyNum, xyArr):
+        self.xmin = xmin
+        self.ymin = ymin
+        self.xmax = xmax
+        self.ymax = ymax
+        self.xyNum = xyNum
+        self.xyArr = xyArr
+
+    def __repr__(self):
+        return "PolygonType({},{},{},{})".format(self.xmin, self.ymin, self.xmax, self.ymax)
 
     def __str__(self):
         return "({},{},{},{})".format(self.xmin, self.ymin, self.xmax, self.ymax)

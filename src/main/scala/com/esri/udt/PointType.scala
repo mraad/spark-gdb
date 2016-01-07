@@ -8,7 +8,7 @@ import org.apache.spark.sql.types.SQLUserDefinedType
 /**
   */
 @SQLUserDefinedType(udt = classOf[PointUDT])
-class PointType(var x: Double = 0.0, var y: Double = 0.0) extends GeometryType with KryoSerializable {
+class PointType(var x: Double = 0.0, var y: Double = 0.0) extends SpatialType with KryoSerializable {
 
   @transient lazy override val asGeometry = new Point(x, y)
 

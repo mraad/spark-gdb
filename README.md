@@ -11,8 +11,9 @@ There is still a lot to be done, but is a good start. Eventually, I will merge t
 
 Update (Jan 7 2016) - for Polylines and Polygons, I'm mimicking the core Spark Vector class. In a way, they have almost the same semantics.
 
+* Implement asGeometry
 * ~~Use [Esri Geometry Library](https://github.com/Esri/geometry-api-java) rather than JTS (I love JTS, so many utility functions on they geometry model)~~
-* Implement ~~Point~~, ~~Polyline~~ and Polygon as Spatial Type using UDT spec.
+* Implement ~~Point~~, ~~Polyline~~ and ~~Polygon~~ as Spatial Type using UDT spec.
 * Handle more shapes - multiXXX and with Z and M
 * Read default values in field definitions
 * Register custom [Kryo](https://github.com/EsotericSoftware/kryo) serializer for shapes (optimization - but worth it :-)
@@ -21,6 +22,7 @@ Update (Jan 7 2016) - for Polylines and Polygons, I'm mimicking the core Spark V
 * Test XML field type
 * Test Blob field type
 * Handle Raster (super low priority)
+* Make internal structure of Shapes more like [GeoJSON](http://geojson.org/geojson-spec.html) but will be heavy for SerDe !
 
 ## Building From Source
 
@@ -40,7 +42,7 @@ In the case of the `Points` feature class, the x/y coordinate values should matc
 ## Using with Spark shell
 
 ```bash
-$SPARK_HOME/bin/spark-shell --packages com.esri:spark-gdb:0.2
+$SPARK_HOME/bin/spark-shell --packages com.esri:spark-gdb:0.3
 ```
 
 ```scala
@@ -166,7 +168,7 @@ hadoop fs -put /Users/<YOUR_PATH>/spark-gdb/src/test/resources/Test.gdb /data
 
 Start A Spark shell:
 ```bash
-spark-shell --jars /Users/<YOUR_PATH>/spark-gdb/target/spark-gdb-0.2.jar
+spark-shell --jars /Users/<YOUR_PATH>/spark-gdb/target/spark-gdb-0.3.jar
 ```
 
 Submit a Spark Context job:

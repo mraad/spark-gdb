@@ -3,28 +3,28 @@ package com.esri.udt
 import com.esri.core.geometry.Geometry
 
 /**
-  * PolylineType
+  * PolygonType
   *
   * @param xyNum each element contains the number of xy pairs to read for a part
   * @param xyArr sequence of xy elements
   */
-class PolylineType(override val xmin: Double,
-                   override val ymin: Double,
-                   override val xmax: Double,
-                   override val ymax: Double,
-                   override val xyNum: Array[Int],
-                   override val xyArr: Array[Double]
-                  ) extends PolyType(xmin, ymin, xmax, ymax, xyNum, xyArr) {
+class PolygonType(override val xmin: Double,
+                  override val ymin: Double,
+                  override val xmax: Double,
+                  override val ymax: Double,
+                  override val xyNum: Array[Int],
+                  override val xyArr: Array[Double]
+                 ) extends PolyType(xmin, ymin, xmax, ymax, xyNum, xyArr) {
 
   @transient override lazy val asGeometry: Geometry = ???
 
   override def equals(other: Any): Boolean = other match {
-    case that: PolylineType => equalsType(that)
+    case that: PolygonType => equalsType(that)
     case _ => false
   }
 }
 
-object PolylineType {
+object PolygonType {
   def apply(xmin: Double,
             ymin: Double,
             xmax: Double,
@@ -32,9 +32,9 @@ object PolylineType {
             xyNum: Array[Int],
             xyArr: Array[Double]
            ) = {
-    new PolylineType(xmin, ymin, xmax, ymax, xyNum, xyArr)
+    new PolygonType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 
-  def unapply(p: PolylineType) =
+  def unapply(p: PolygonType) =
     Some((p.xmin, p.ymin, p.xmax, p.ymax, p.xyNum, p.xyArr))
 }

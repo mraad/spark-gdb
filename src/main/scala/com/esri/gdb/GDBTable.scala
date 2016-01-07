@@ -277,7 +277,7 @@ object GDBTable {
       case 3 =>
         FieldPolylineType(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
       case 4 | 5 =>
-        FieldPolygon(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
+        FieldPolygonType(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
       case _ =>
         new FieldGeomNoop(name, nullAllowed)
     }

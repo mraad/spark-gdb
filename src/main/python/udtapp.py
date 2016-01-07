@@ -37,6 +37,17 @@ if __name__ == "__main__":
         for row in rows.collect():
             print row
 
+        polygons = "Polygons"
+        df_polygons = sqlContext.read \
+            .format("com.esri.gdb") \
+            .options(path="../../test/resources/Test.gdb", name=polygons, numPartitions="2") \
+            .load()
+        df_polygons.printSchema()
+        df_polygons.registerTempTable(polygons)
+        rows = sqlContext.sql("select * from {}".format(polygons))
+        for row in rows.collect():
+            print row
+
             # sqlContext \
             #    .sql("select * from {}".format(gdb_name)) \
             #    .write \

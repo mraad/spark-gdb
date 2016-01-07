@@ -1,7 +1,6 @@
 package com.esri.gdb
 
-import com.esri.core.geometry.{Envelope2D, Polygon}
-import com.esri.udt.{GeometryUDT, PointType, PolylineType}
+import com.esri.udt.{PointType, PolygonType, PolylineType}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.joda.time.{DateTime, DateTimeZone}
@@ -104,7 +103,7 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       "RID",
       "OBJECTID")
     results.collect.foreach(row => {
-      val polygon = row.getAs[GeometryUDT](0).geometry.asInstanceOf[Polygon]
+      val polygon = row.getAs[PolygonType](0)
       val x1 = row.getDouble(1)
       val y1 = row.getDouble(2)
       val x2 = row.getDouble(3)
@@ -112,14 +111,11 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       val rid = row.getInt(5)
       val oid = row.getInt(6)
 
-      val envp = new Envelope2D()
-      polygon.queryEnvelope2D(envp)
+      assert((polygon.xmin - x1).abs <= xyTolerance)
+      assert((polygon.ymin - y1).abs <= xyTolerance)
 
-      assert((envp.xmin - x1).abs <= xyTolerance)
-      assert((envp.ymin - y1).abs <= xyTolerance)
-
-      assert((envp.xmax - x2).abs <= xyTolerance)
-      assert((envp.ymax - y2).abs <= xyTolerance)
+      assert((polygon.xmax - x2).abs <= xyTolerance)
+      assert((polygon.ymax - y2).abs <= xyTolerance)
 
       assert(rid === oid)
     })

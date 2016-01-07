@@ -3,8 +3,8 @@ package com.esri.gdb
 import java.nio.ByteBuffer
 
 import com.esri.core.geometry.Polyline
-import com.esri.udt.ShapeEsri
-import org.apache.spark.sql.types.{DataType, Metadata}
+import com.esri.udt.PolygonUDT
+import org.apache.spark.sql.types.Metadata
 
 object FieldPolyline extends Serializable {
   def apply(name: String,
@@ -13,19 +13,18 @@ object FieldPolyline extends Serializable {
             yOrig: Double,
             xyScale: Double,
             metadata: Metadata) = {
-    new FieldPolylineEsri(name, nullValueAllowed, xOrig, yOrig, xyScale, metadata)
+    new FieldPolyline(name, nullValueAllowed, xOrig, yOrig, xyScale, metadata)
   }
 }
 
-abstract class FieldPolyline(name: String,
-                             dataType: DataType,
-                             nullValueAllowed: Boolean,
-                             xOrig: Double,
-                             yOrig: Double,
-                             xyScale: Double,
-                             metadata: Metadata
-                            )
-  extends FieldPoly(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
+class FieldPolyline(name: String,
+                    nullValueAllowed: Boolean,
+                    xOrig: Double,
+                    yOrig: Double,
+                    xyScale: Double,
+                    metadata: Metadata
+                   )
+  extends FieldPoly(name, new PolygonUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val polyline = new Polyline()
@@ -63,13 +62,3 @@ abstract class FieldPolyline(name: String,
     polyline
   }
 }
-
-class FieldPolylineEsri(name: String,
-                        nullValueAllowed: Boolean,
-                        xOrig: Double,
-                        yOrig: Double,
-                        xyScale: Double,
-                        metadata: Metadata
-                       )
-  extends FieldPolyline(name, ShapeEsri("polyline"), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
-
