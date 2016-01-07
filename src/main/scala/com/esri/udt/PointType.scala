@@ -24,24 +24,10 @@ class PointType(val x: Double = 0.0, val y: Double = 0.0) extends SpatialType {
 
   override def toString = s"PointType($x, $y)"
 
-  /*
-    // TODO - Worth it ??, pass in precision
-    override def write(kryo: Kryo, output: Output): Unit = {
-      output.writeDouble(x)
-      output.writeDouble(y)
-    }
-
-    override def read(kryo: Kryo, input: Input): Unit = {
-      x = input.readDouble()
-      y = input.readDouble()
-    }
-  */
 }
 
 object PointType {
   def apply(x: Double, y: Double) = new PointType(x, y)
 
-  def unapply(p: PointType) =
-    Some((p.x, p.y))
-
+  def unapply(p: PointType) = Some((p.x, p.y))
 }
