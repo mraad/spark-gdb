@@ -7,6 +7,7 @@ import org.apache.spark.sql.types._
 /**
   */
 abstract class PolyUDT[T] extends UserDefinedType[T] {
+
   override def sqlType: DataType = StructType(Seq(
     StructField("xmin", DoubleType, false),
     StructField("ymin", DoubleType, false),

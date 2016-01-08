@@ -2,7 +2,7 @@ package com.esri.app
 
 import com.esri.core.geometry.Polyline
 import com.esri.udt.{PointType, PolylineType}
-import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.{SQLContext, SaveMode}
 import org.apache.spark.{Logging, SparkConf, SparkContext}
 
 /**
@@ -45,20 +45,17 @@ object Main extends App with Logging {
     sqlContext.udf.register("getX", (point: PointType) => point.x)
     sqlContext.udf.register("getY", (point: PointType) => point.y)
     sqlContext.udf.register("line", (point: PointType) => PolylineType({
-      val line = new Polyline()
-      line.startPath(point.x - 2, point.y - 2)
-      line.lineTo(point.x + 2, point.y + 2)
-      line
+      val polyline = new Polyline()
+      polyline.startPath(point.x - 2, point.y - 2)
+      polyline.lineTo(point.x + 2, point.y + 2)
+      polyline
     }
     ))
     sqlContext.sql(s"select line(Shape),getX(Shape)-2 as x from $name")
-      .foreach(println)
-    /*
-          .write
-          .mode(SaveMode.Overwrite)
-          .format("json")
-          .save(s"/tmp/$name.json")
-    */
+      .write
+      .mode(SaveMode.Overwrite)
+      .format("json")
+      .save(s"/tmp/$name.json")
   } finally {
     sc.stop()
   }
