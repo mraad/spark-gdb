@@ -1,4 +1,4 @@
-__all__ = ['PointType', 'PolylineType']
+__all__ = ['PointType', 'PolylineType', 'PolygonType']
 
 import array
 import sys

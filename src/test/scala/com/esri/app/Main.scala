@@ -52,7 +52,7 @@ object Main extends App with Logging {
     }
     ))
     sqlContext.sql(s"select line(Shape),getX(Shape)-2 as x from $name")
-      .show(20)
+      .foreach(println)
     /*
           .write
           .mode(SaveMode.Overwrite)
