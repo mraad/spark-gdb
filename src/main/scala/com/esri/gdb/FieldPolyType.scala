@@ -47,6 +47,7 @@ abstract class FieldPolyType[T](name: String,
           i += 1
         }
       })
+      i = 0
       xyNum.foreach(numXY => {
         0 until numXY foreach (n => {
           dx += blob.getVarInt

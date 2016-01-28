@@ -8,11 +8,11 @@ import org.apache.spark.sql.types.{DataType, Metadata}
 abstract class FieldPoly(name: String,
                          dataType: DataType,
                          nullValueAllowed: Boolean,
-                         xorig: Double,
-                         yorig: Double,
-                         xyscale: Double,
+                         xOrig: Double,
+                         yOrig: Double,
+                         xyScale: Double,
                          metadata: Metadata)
-  extends FieldGeom(name, dataType, nullValueAllowed, xorig, yorig, xyscale, metadata) {
+  extends FieldGeom(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
   protected var dx = 0L
   protected var dy = 0L
@@ -21,8 +21,8 @@ abstract class FieldPoly(name: String,
     0 until numCoordinates foreach (n => {
       dx += byteBuffer.getVarInt
       dy += byteBuffer.getVarInt
-      val x = dx / xyscale + xorig
-      val y = dy / xyscale + yorig
+      val x = dx / xyScale + xOrig
+      val y = dy / xyScale + yOrig
       n match {
         case 0 => path.startPath(x, y)
         case _ => path.lineTo(x, y)

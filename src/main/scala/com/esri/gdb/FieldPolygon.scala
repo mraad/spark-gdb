@@ -60,7 +60,6 @@ abstract class FieldPolygon(name: String,
       numCoordSeq.foreach(numCoord => addPath(blob, numCoord, polygon))
     }
     else {
-      // createPolygon(getCoordinates(blob, numPoints))
       addPath(blob, numPoints, polygon)
     }
     polygon
@@ -72,5 +71,5 @@ class FieldPolygonEsri(name: String,
                        xOrig: Double,
                        yOrig: Double,
                        xyScale: Double,
-                       metadata: Metadata
-                      ) extends FieldPolygon(name, new PolygonUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
+                       metadata: Metadata)
+  extends FieldPolygon(name, new PolygonUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
