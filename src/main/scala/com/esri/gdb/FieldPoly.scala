@@ -12,7 +12,7 @@ abstract class FieldPoly(name: String,
                          yOrig: Double,
                          xyScale: Double,
                          metadata: Metadata)
-  extends FieldGeom(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
+  extends FieldBytes(name, dataType, nullValueAllowed, metadata) {
 
   protected var dx = 0L
   protected var dy = 0L

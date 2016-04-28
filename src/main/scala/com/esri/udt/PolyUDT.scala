@@ -24,8 +24,8 @@ abstract class PolyUDT[T] extends UserDefinedType[T] {
     row.setDouble(2, xmax)
     row.setDouble(3, ymax)
     /* Spark 1.5
-        row.update(4, new GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
-        row.update(5, new GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
+    row.update(4, new GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
+    row.update(5, new GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
     */
     /*
         For Spark 1.6

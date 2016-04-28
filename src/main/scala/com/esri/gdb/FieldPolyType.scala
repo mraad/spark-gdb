@@ -13,7 +13,7 @@ abstract class FieldPolyType[T](name: String,
                                 yOrig: Double,
                                 xyScale: Double,
                                 metadata: Metadata)
-  extends FieldGeom(name, dataType, nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
+  extends FieldBytes(name, dataType, nullValueAllowed, metadata) {
 
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)

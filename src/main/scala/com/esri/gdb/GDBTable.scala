@@ -8,7 +8,6 @@ import org.apache.hadoop.fs.Path
 import org.apache.spark.Logging
 import org.apache.spark.sql.types.{MetadataBuilder, StructType}
 
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 class GDBTable(dataBuffer: DataBuffer,
@@ -67,15 +66,17 @@ object GDBTable {
 
     val fields = 0 until numFields map (_ => {
       val nameLen = bb2.get
-      val nameSB = new StringBuilder(nameLen)
-      0 until nameLen foreach (_ => nameSB.append(bb2.getChar))
-      val name = nameSB.toString()
+      val name = ((0 until nameLen).foldLeft(new StringBuilder(nameLen))((sb, _) => {
+        sb.append(bb2.getChar)
+      })).toString
 
       val aliasLen = bb2.get
-      val aliasSB = new mutable.StringBuilder(aliasLen)
-      0 until aliasLen foreach (_ => aliasSB.append(bb2.getChar))
-      val aliasTemp = aliasSB.toString()
+      val aliasTemp = ((0 until aliasLen).foldLeft(new StringBuilder(aliasLen))((sb, _) => {
+        sb.append(bb2.getChar)
+      })).toString
       val alias = if (aliasTemp.isEmpty) name else aliasTemp
+
+      // println(s"$name $alias")
 
       val fieldType = bb2.get
       fieldType match {
@@ -226,7 +227,7 @@ object GDBTable {
       case _ => (false, false)
     }
 
-    // println(s"geometryType=$geometryType zAndM=$zAndM hasZ=$hasZ hasM=$hasM geomProp=$geometryProp")
+    println(s"geometryType=$geometryType zAndM=$zAndM hasZ=$hasZ hasM=$hasM geomProp=$geometryProp")
 
     val xOrig = bb.getDouble
     val yOrig = bb.getDouble
