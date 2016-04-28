@@ -3,7 +3,7 @@ package com.esri.gdb
 import java.nio.ByteBuffer
 
 import com.esri.core.geometry.Polyline
-import com.esri.udt.PolygonUDT
+import com.esri.udt.PolylineUDT
 import org.apache.spark.sql.types.Metadata
 
 object FieldPolyline extends Serializable {
@@ -24,7 +24,7 @@ class FieldPolyline(name: String,
                     xyScale: Double,
                     metadata: Metadata
                    )
-  extends FieldPoly(name, new PolygonUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
+  extends FieldPoly(name, new PolylineUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val polyline = new Polyline()
