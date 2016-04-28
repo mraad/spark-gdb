@@ -1,7 +1,9 @@
 .idea/
-*.iml
-*.pyc
-ss-*.sh
 target/
+metastore_db/
+project/
+src/test/python/*.xml
+*.iml
+ss-*.sh
 dependency-reduced-pom.xml
 derby.log

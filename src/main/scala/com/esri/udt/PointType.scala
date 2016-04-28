@@ -13,7 +13,7 @@ class PointType(val x: Double = 0.0, val y: Double = 0.0) extends SpatialType {
   def ==(that: PointType) = this.x == that.x && this.y == that.y
 
   override def equals(other: Any): Boolean = other match {
-    case that: PointType => x == that.x && y == that.y
+    case that: PointType => this == that
     case _ => false
   }
 

@@ -1,4 +1,4 @@
-__all__ = ['PointType', 'PolylineType', 'PolygonType']
+__all__ = ['PointType', 'PointZType', 'PointMType', 'PointZMType', 'PolylineType', 'PolygonType']
 
 import array
 import sys
@@ -23,6 +23,165 @@ if sys.version_info[:2] == (2, 7):
 
 
     copy_reg.pickle(array.array, fast_pickle_array)
+
+
+class PointZUDT(UserDefinedType):
+    """
+    SQL user-defined type (UDT) for PointZ.
+    """
+
+    @classmethod
+    def sqlType(self):
+        return StructType([
+            StructField("x", DoubleType(), False),
+            StructField("y", DoubleType(), False),
+            StructField("z", DoubleType(), False)
+        ])
+
+    @classmethod
+    def module(cls):
+        return "com.esri.udt"
+
+    @classmethod
+    def scalaUDT(cls):
+        return "com.esri.udt.PointZUDT"
+
+    def serialize(self, obj):
+        return obj.x, obj.y, obj.z
+
+    def deserialize(self, datum):
+        return PointZType(datum[0], datum[1], datum[2])
+
+    def simpleString(self):
+        return "pointZ"
+
+
+class PointZType(object):
+    __UDT__ = PointZUDT()
+
+    def __init__(self, x, y, z):
+        self.x = x
+        self.y = y
+        self.z = z
+
+    def __repr__(self):
+        return "PointZType({},{},{})".format(self.x, self.y, self.z)
+
+    def __str__(self):
+        return "({},{},{})".format(self.x, self.y, self.z)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and \
+               other.x == self.x and \
+               other.y == self.y and \
+               other.z == self.z
+
+
+class PointMUDT(UserDefinedType):
+    """
+    SQL user-defined type (UDT) for PointM.
+    """
+
+    @classmethod
+    def sqlType(self):
+        return StructType([
+            StructField("x", DoubleType(), False),
+            StructField("y", DoubleType(), False),
+            StructField("m", DoubleType(), False)
+        ])
+
+    @classmethod
+    def module(cls):
+        return "com.esri.udt"
+
+    @classmethod
+    def scalaUDT(cls):
+        return "com.esri.udt.PointMUDT"
+
+    def serialize(self, obj):
+        return obj.x, obj.y, obj.m
+
+    def deserialize(self, datum):
+        return PointMType(datum[0], datum[1], datum[2])
+
+    def simpleString(self):
+        return "pointM"
+
+
+class PointMType(object):
+    __UDT__ = PointMUDT()
+
+    def __init__(self, x, y, m):
+        self.x = x
+        self.y = y
+        self.m = m
+
+    def __repr__(self):
+        return "PointMType({},{},{})".format(self.x, self.y, self.m)
+
+    def __str__(self):
+        return "({},{},{})".format(self.x, self.y, self.m)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and \
+               other.x == self.x and \
+               other.y == self.y and \
+               other.m == self.m
+
+
+class PointZMUDT(UserDefinedType):
+    """
+    SQL user-defined type (UDT) for PointZM.
+    """
+
+    @classmethod
+    def sqlType(self):
+        return StructType([
+            StructField("x", DoubleType(), False),
+            StructField("y", DoubleType(), False),
+            StructField("z", DoubleType(), False),
+            StructField("m", DoubleType(), False)
+        ])
+
+    @classmethod
+    def module(cls):
+        return "com.esri.udt"
+
+    @classmethod
+    def scalaUDT(cls):
+        return "com.esri.udt.PointZMUDT"
+
+    def serialize(self, obj):
+        return obj.x, obj.y, obj.z, obj.m
+
+    def deserialize(self, datum):
+        return PointZMType(datum[0], datum[1], datum[2], datum[3])
+
+    def simpleString(self):
+        return "pointZM"
+
+
+class PointZMType(object):
+    __UDT__ = PointZMUDT()
+
+    def __init__(self, x, y, z, m):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.m = m
+
+    def __repr__(self):
+        return "PointZMType({},{},{},{})".format(self.x, self.y, self.z, self.m)
+
+    def __str__(self):
+        return "({},{},{},{})".format(self.x, self.y, self.z, self.m)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and \
+               other.x == self.x and \
+               other.y == self.y and \
+               other.z == self.z and \
+               other.m == self.m
 
 
 class PointUDT(UserDefinedType):

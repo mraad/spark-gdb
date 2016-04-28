@@ -4,8 +4,8 @@ import com.esri.gdb.{GDBIndex, GDBTable}
 import resource._
 
 object GDBApp extends App {
-  val gdb = "/Users/mraad_admin/Share/World.gdb"
-  GDBTable.findTable(gdb, "Cities")
+  val gdb = "/Users/mraad_admin/GWorkspace/spark-gdb/src/test/resources/Test.gdb"
+  GDBTable.findTable(gdb, "ZMPoints")
     .foreach(catTab => {
       for {
         index <- managed(GDBIndex(gdb, catTab.hexName))

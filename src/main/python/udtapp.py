@@ -16,34 +16,67 @@ if __name__ == "__main__":
         sqlContext.registerFunction("plus2", lambda p: PointType(p.x + 2, p.y + 2), PointUDT())
 
         points = "Points"
-        df_points = sqlContext.read \
+        df = sqlContext.read \
             .format("com.esri.gdb") \
             .options(path="../../test/resources/Test.gdb", name=points, numPartitions="1") \
             .load()
-        df_points.printSchema()
-        df_points.registerTempTable(points)
+        df.printSchema()
+        df.registerTempTable(points)
         rows = sqlContext.sql("select plus2(Shape),X,Y from {}".format(points))
         for row in rows.collect():
             print row
 
+        points = "MPoints"
+        df = sqlContext.read \
+            .format("com.esri.gdb") \
+            .options(path="../../test/resources/Test.gdb", name=points, numPartitions="1") \
+            .load()
+        df.printSchema()
+        df.registerTempTable(points)
+        rows = sqlContext.sql("select * from {}".format(points))
+        for row in rows.collect():
+            print row
+
+        points = "ZPoints"
+        df = sqlContext.read \
+            .format("com.esri.gdb") \
+            .options(path="../../test/resources/Test.gdb", name=points, numPartitions="1") \
+            .load()
+        df.printSchema()
+        df.registerTempTable(points)
+        rows = sqlContext.sql("select * from {}".format(points))
+        for row in rows.collect():
+            print row
+
+        points = "ZMPoints"
+        df = sqlContext.read \
+            .format("com.esri.gdb") \
+            .options(path="../../test/resources/Test.gdb", name=points, numPartitions="1") \
+            .load()
+        df.printSchema()
+        df.registerTempTable(points)
+        rows = sqlContext.sql("select * from {}".format(points))
+        for row in rows.collect():
+            print row
+
         lines = "Lines"
-        df_lines = sqlContext.read \
+        df = sqlContext.read \
             .format("com.esri.gdb") \
             .options(path="../../test/resources/Test.gdb", name=lines, numPartitions="2") \
             .load()
-        df_lines.printSchema()
-        df_lines.registerTempTable(lines)
+        df.printSchema()
+        df.registerTempTable(lines)
         rows = sqlContext.sql("select * from {}".format(lines))
         for row in rows.collect():
             print row
 
         polygons = "Polygons"
-        df_polygons = sqlContext.read \
+        df = sqlContext.read \
             .format("com.esri.gdb") \
             .options(path="../../test/resources/Test.gdb", name=polygons, numPartitions="2") \
             .load()
-        df_polygons.printSchema()
-        df_polygons.registerTempTable(polygons)
+        df.printSchema()
+        df.registerTempTable(polygons)
         rows = sqlContext.sql("select * from {}".format(polygons))
         for row in rows.collect():
             print row

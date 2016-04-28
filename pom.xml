@@ -5,7 +5,7 @@
 
     <groupId>com.esri</groupId>
     <artifactId>spark-gdb</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -57,12 +57,6 @@
             <scope>${spark-scope}</scope>
         </dependency>
         <dependency>
-            <groupId>com.jsuereth</groupId>
-            <artifactId>scala-arm_${scala.compact.version}</artifactId>
-            <version>1.4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.9.1</version>
@@ -75,9 +69,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.jsuereth</groupId>
+            <artifactId>scala-arm_${scala.compact.version}</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.compact.version}</artifactId>
-            <version>2.2.3</version>
+            <version>2.2.6</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -214,16 +214,19 @@
             </properties>
         </profile>
         <profile>
-            <id>spark-1.6.0</id>
+            <id>spark-1.6.1</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
             <properties>
-                <spark.version>1.6.0</spark.version>
+                <spark.version>1.6.1</spark.version>
                 <java.version>1.8</java.version>
             </properties>
         </profile>
         <profile>
             <id>spark-1.5.2</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <spark.version>1.5.2</spark.version>

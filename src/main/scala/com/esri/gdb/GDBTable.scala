@@ -54,12 +54,14 @@ object GDBTable {
 
     val bb1 = dataBuffer.readBytes(4 + 4 + 4 + 2)
     val numBytes = bb1.getInt
-    val i1 = bb1.getInt
+    val i1 = bb1.getInt // Seems to be 3 for FGDB 9.X files and 4 for FGDB 10.X files
     val geometryType = bb1.get
     val b2 = bb1.get
     val b3 = bb1.get
-    val b4 = bb1.get
+    val geometryProp = bb1.get & 0xFF // 0x40 for geometry with M, 0x80 for geometry with Z
     val numFields = bb1.getShort
+
+    // println(s"gdbType=$i1 $b2 $b3 $geometryProp")
 
     val bb2 = dataBuffer.readBytes(numBytes)
 
@@ -84,7 +86,7 @@ object GDBTable {
         case EsriFieldType.DATETIME => toFieldDateTime(bb2, name, alias)
         case EsriFieldType.STRING => toFieldString(bb2, name, alias)
         case EsriFieldType.OID => toFieldOID(bb2, name, alias)
-        case EsriFieldType.SHAPE => toFieldGeom(bb2, name, alias, geometryType)
+        case EsriFieldType.SHAPE => toFieldGeom(bb2, name, alias, geometryType, geometryProp)
         case EsriFieldType.BINARY => toFieldBinary(bb2, name, alias)
         case EsriFieldType.UUID | EsriFieldType.GUID => toFieldUUID(bb2, name, alias)
         case EsriFieldType.XML => toFieldXML(bb2, name, alias)
@@ -206,9 +208,9 @@ object GDBTable {
     new FieldOID(name, (flag & 1) == 1, metadata)
   }
 
-  private def toFieldGeom(bb: ByteBuffer, name: String, alias: String, geometryType: Byte): Field = {
-    val len = bb.get
-    val flag = bb.get
+  private def toFieldGeom(bb: ByteBuffer, name: String, alias: String, geometryType: Byte, geometryProp: Int): Field = {
+    bb.get // unk
+    val flag = bb.get // 6 or 7. If lsb is 1, the field can be null.
     val nullAllowed = (flag & 1) == 1
 
     val crsLen = bb.getShort
@@ -224,7 +226,7 @@ object GDBTable {
       case _ => (false, false)
     }
 
-    // log.info(s"hasZ=$hasZ  hasM=$hasM")
+    // println(s"geometryType=$geometryType zAndM=$zAndM hasZ=$hasZ hasM=$hasM geomProp=$geometryProp")
 
     val xOrig = bb.getDouble
     val yOrig = bb.getDouble
@@ -258,22 +260,35 @@ object GDBTable {
         numes += bb.getDouble
       }
     }
-    val metadata = new MetadataBuilder()
+    // numes.foreach(println)
+
+    // println(s"$zOrig $zScale $zTolerance $mOrig $mScale $mTolerance")
+
+    val metadataBuilder = new MetadataBuilder()
       .putString("alias", alias)
       .putString("crs", crs)
       .putDouble("xmin", xmin)
       .putDouble("ymin", ymin)
       .putDouble("xmax", xmax)
       .putDouble("ymax", ymax)
+      .putBoolean("hasZ", hasZ)
+      .putBoolean("hasM", hasM)
       .putDouble("xyTolerance", xyTolerance)
-      // .putBoolean("hasZ", hasZ)
-      // .putBoolean("hasM", hasM)
-      .build()
+
+    if (hasZ) metadataBuilder.putDouble("zTolerance", zTolerance)
+    if (hasM) metadataBuilder.putDouble("mTolerance", mTolerance)
+
+    val metadata = metadataBuilder.build()
 
     // TODO - more shapes, Z and M
     geometryType match {
       case 1 =>
-        FieldPointType(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
+        geometryProp match {
+          case 0x00 => FieldPointType(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
+          case 0x40 => FieldPointMType(name, nullAllowed, xOrig, yOrig, mOrig, xyScale, mScale, metadata)
+          case 0x80 => FieldPointZType(name, nullAllowed, xOrig, yOrig, zOrig, xyScale, zScale, metadata)
+          case _ => FieldPointZMType(name, nullAllowed, xOrig, yOrig, zOrig, mOrig, xyScale, zScale, mScale, metadata)
+        }
       case 3 =>
         FieldPolylineType(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
       case 4 | 5 =>

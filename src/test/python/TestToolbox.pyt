@@ -1,15 +1,15 @@
-import datetime
 import os
 import random
 
 import arcpy
+import datetime
 
 
 class Toolbox(object):
     def __init__(self):
         self.label = "Test Toolbox"
-        self.alias = "Toolbox to generate random point, line and polygon feature classes to test Spark FileGDB"
-        self.tools = [PointTool, LineTool, PolygonTool, TypesTool]
+        self.alias = "Toolbox to generate random point(Z/M), line(M) and polygon feature classes to test Spark FileGDB"
+        self.tools = [PointZMTool, PointZTool, PointMTool, PointTool, LineMTool, LineTool, PolygonTool, TypesTool]
 
 
 class BaseTool(object):
@@ -18,10 +18,10 @@ class BaseTool(object):
 
     def getParameterInfo(self):
         paramPath = arcpy.Parameter(
-                name="gdb_path",
-                displayName="gdb_path",
-                direction="Input",
-                datatype="String")
+            name="gdb_path",
+            displayName="gdb_path",
+            direction="Input",
+            datatype="String")
         paramPath.value = "C:\\Temp\\Test.gdb"
         return [paramPath]
 
@@ -34,7 +34,7 @@ class BaseTool(object):
     def updateMessages(self, parameters):
         return
 
-    def createFeatureClass(self, parameters, name, fc_type):
+    def createFeatureClass(self, parameters, name, fc_type, has_z="DISABLED", has_m="DISABLED"):
         path = parameters[0].value
         if not os.path.exists(path):
             head, tail = os.path.split(path)
@@ -43,7 +43,10 @@ class BaseTool(object):
         fc = "{}/{}".format(path, name)
         if arcpy.Exists(fc):
             arcpy.management.Delete(fc)
-        arcpy.management.CreateFeatureclass(path, name, fc_type, spatial_reference=arcpy.SpatialReference(4326))
+        arcpy.management.CreateFeatureclass(path, name, fc_type,
+                                            has_z=has_z,
+                                            has_m=has_m,
+                                            spatial_reference=arcpy.SpatialReference(4326))
         return fc
 
 
@@ -78,6 +81,79 @@ class TypesTool(BaseTool):
                               "{2AA7D58D-2BF4-4943-83A8-457B70DB1871}"])
 
 
+class PointMTool(BaseTool):
+    def __init__(self):
+        super(PointMTool, self).__init__()
+        self.label = "Generate Random MPoints"
+        self.description = "Generate Random MPoints"
+
+    def execute(self, parameters, messages):
+        fc = self.createFeatureClass(parameters, "MPoints", "POINT", has_m="ENABLED")
+        arcpy.management.AddField(fc, "X", "DOUBLE")
+        arcpy.management.AddField(fc, "Y", "DOUBLE")
+        arcpy.management.AddField(fc, "M", "DOUBLE")
+        arcpy.management.AddField(fc, "RID", "INTEGER")
+
+        with arcpy.da.InsertCursor(fc, ["SHAPE@X", "SHAPE@Y", "SHAPE@M", "X", "Y", "M", "RID"]) as cursor:
+            for rid in range(1, 21):
+                x = random.uniform(-180, 180)
+                y = random.uniform(-90, 90)
+                m = random.uniform(0, 100)
+                cursor.insertRow([x, y, m, x, y, m, rid])
+
+
+class PointZTool(BaseTool):
+    def __init__(self):
+        super(PointZTool, self).__init__()
+        self.label = "Generate Random ZPoints"
+        self.description = "Generate Random ZPoints"
+
+    def execute(self, parameters, messages):
+        fc = self.createFeatureClass(parameters, "ZPoints", "POINT", has_z="ENABLED")
+        arcpy.management.AddField(fc, "X", "DOUBLE")
+        arcpy.management.AddField(fc, "Y", "DOUBLE")
+        arcpy.management.AddField(fc, "Z", "DOUBLE")
+        arcpy.management.AddField(fc, "RID", "INTEGER")
+
+        with arcpy.da.InsertCursor(fc, ["SHAPE@X", "SHAPE@Y", "SHAPE@Z", "X", "Y", "Z", "RID"]) as cursor:
+            for rid in range(1, 21):
+                x = random.uniform(-180, 180)
+                y = random.uniform(-90, 90)
+                z = random.uniform(0, 100)
+                cursor.insertRow([x, y, z, x, y, z, rid])
+
+
+class PointZMTool(BaseTool):
+    def __init__(self):
+        super(PointZMTool, self).__init__()
+        self.label = "Generate Random ZMPoints"
+        self.description = "Generate Random ZMPoints"
+
+    def execute(self, parameters, messages):
+        fc = self.createFeatureClass(parameters, "ZMPoints", "POINT", has_z="ENABLED", has_m="ENABLED")
+        arcpy.management.AddField(fc, "X", "DOUBLE")
+        arcpy.management.AddField(fc, "Y", "DOUBLE")
+        arcpy.management.AddField(fc, "Z", "DOUBLE")
+        arcpy.management.AddField(fc, "M", "DOUBLE")
+        arcpy.management.AddField(fc, "RID", "INTEGER")
+
+        with arcpy.da.InsertCursor(fc, ["SHAPE@X",
+                                        "SHAPE@Y",
+                                        "SHAPE@Z",
+                                        "SHAPE@M",
+                                        "X",
+                                        "Y",
+                                        "Z",
+                                        "M",
+                                        "RID"]) as cursor:
+            for rid in range(1, 21):
+                x = random.uniform(-180, 180)
+                y = random.uniform(-90, 90)
+                z = random.uniform(0, 100)
+                m = random.uniform(0, 100)
+                cursor.insertRow([x, y, z, m, x, y, z, m, rid])
+
+
 class PointTool(BaseTool):
     def __init__(self):
         super(PointTool, self).__init__()
@@ -95,7 +171,6 @@ class PointTool(BaseTool):
                 x = random.uniform(-180, 180)
                 y = random.uniform(-90, 90)
                 cursor.insertRow([(x, y), x, y, rid])
-        return
 
 
 class LineTool(BaseTool):
@@ -124,7 +199,50 @@ class LineTool(BaseTool):
                 y3 = y2 + random.uniform(0, 50)
                 shape = [[x1, y1], [x2, y2], [x3, y3]]
                 cursor.insertRow([shape, x1, y1, x2, y2, x3, y3, rid])
-        return
+
+
+class LineMTool(BaseTool):
+    def __init__(self):
+        super(LineMTool, self).__init__()
+        self.label = "Generate Random MLines"
+        self.description = "Generate Random MLines"
+
+    def execute(self, parameters, messages):
+        fc = self.createFeatureClass(parameters, "MLines", "POLYLINE", has_m="ENABLED")
+        arcpy.management.AddField(fc, "X1", "DOUBLE")
+        arcpy.management.AddField(fc, "Y1", "DOUBLE")
+        arcpy.management.AddField(fc, "M1", "DOUBLE")
+
+        arcpy.management.AddField(fc, "X2", "DOUBLE")
+        arcpy.management.AddField(fc, "Y2", "DOUBLE")
+        arcpy.management.AddField(fc, "M2", "DOUBLE")
+
+        arcpy.management.AddField(fc, "X3", "DOUBLE")
+        arcpy.management.AddField(fc, "Y3", "DOUBLE")
+        arcpy.management.AddField(fc, "M3", "DOUBLE")
+
+        arcpy.management.AddField(fc, "RID", "INTEGER")
+
+        with arcpy.da.InsertCursor(fc, ["SHAPE@",
+                                        "X1", "Y1", "M1",
+                                        "X2", "Y2", "M2",
+                                        "X3", "Y3", "M3",
+                                        "RID"]) as cursor:
+            for rid in range(1, 21):
+                x1 = random.uniform(-180, 0)
+                y1 = random.uniform(-90, 0)
+                m1 = random.uniform(0, 100)
+
+                x2 = x1 + random.uniform(0, 20)
+                y2 = y1 + random.uniform(0, 20)
+                m2 = m1 + random.uniform(0, 100)
+
+                x3 = x2 + random.uniform(0, 50)
+                y3 = y2 + random.uniform(0, 50)
+                m3 = m2 + random.uniform(0, 100)
+
+                shape = [[x1, y1, m1], [x2, y2, m2], [x3, y3, m3]]
+                cursor.insertRow([shape, x1, y1, m1, x2, y2, m2, x3, y3, m3, rid])
 
 
 class PolygonTool(BaseTool):
@@ -151,4 +269,3 @@ class PolygonTool(BaseTool):
                 ym = (y1 + y2) / 2.0
                 shape = [[x1, y1], [x1, y2], [xm, y2], [xm, ym], [x2, ym], [x2, y1], [x1, y1]]
                 cursor.insertRow([shape, x1, y1, x2, y2, rid])
-        return

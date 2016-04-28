@@ -22,7 +22,7 @@ class FieldPointType(name: String,
                      yOrig: Double,
                      xyScale: Double,
                      metadata: Metadata)
-  extends FieldGeom(name, new PointUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
+  extends FieldBytes(name, new PointUDT(), nullValueAllowed, metadata) {
 
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)
@@ -37,9 +37,3 @@ class FieldPointType(name: String,
     new PointType(x, y)
   }
 }
-
-/*
-@deprecated
-class FieldPointEsri(name: String, nullValueAllowed: Boolean, xOrig: Double, yOrig: Double, xyScale: Double, metadata: Metadata)
-  extends FieldPoint(name, new PointUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata)
-*/

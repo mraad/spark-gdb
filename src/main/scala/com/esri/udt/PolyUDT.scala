@@ -23,13 +23,15 @@ abstract class PolyUDT[T] extends UserDefinedType[T] {
     row.setDouble(1, ymin)
     row.setDouble(2, xmax)
     row.setDouble(3, ymax)
-    row.update(4, new GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
-    row.update(5, new GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
+    /* Spark 1.5
+        row.update(4, new GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
+        row.update(5, new GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
+    */
     /*
         For Spark 1.6
-        row.update(4, new org.apache.spark.sql.catalyst.util.GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
-        row.update(5, new org.apache.spark.sql.catalyst.util.GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
     */
+    row.update(4, new org.apache.spark.sql.catalyst.util.GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
+    row.update(5, new org.apache.spark.sql.catalyst.util.GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
     row
   }
 
