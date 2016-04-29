@@ -267,5 +267,6 @@ class PolygonTool(BaseTool):
                 y2 = y1 + random.uniform(1, 40)
                 xm = (x1 + x2) / 2.0
                 ym = (y1 + y2) / 2.0
+                # CW Order
                 shape = [[x1, y1], [x1, y2], [xm, y2], [xm, ym], [x2, ym], [x2, y1], [x1, y1]]
                 cursor.insertRow([shape, x1, y1, x2, y2, rid])

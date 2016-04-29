@@ -227,7 +227,7 @@ object GDBTable {
       case _ => (false, false)
     }
 
-    println(s"geometryType=$geometryType zAndM=$zAndM hasZ=$hasZ hasM=$hasM geomProp=$geometryProp")
+    // println(s"geometryType=$geometryType zAndM=$zAndM hasZ=$hasZ hasM=$hasM geomProp=$geometryProp")
 
     val xOrig = bb.getDouble
     val yOrig = bb.getDouble
@@ -281,6 +281,8 @@ object GDBTable {
 
     val metadata = metadataBuilder.build()
 
+    // println(s"geometryType=$geometryType geometryProp=$geometryProp")
+
     // TODO - more shapes, Z and M
     geometryType match {
       case 1 =>
@@ -291,7 +293,11 @@ object GDBTable {
           case _ => FieldPointZMType(name, nullAllowed, xOrig, yOrig, zOrig, mOrig, xyScale, zScale, mScale, metadata)
         }
       case 3 =>
-        FieldPolylineType(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
+        geometryProp match {
+          case 0x00 => FieldPolylineType(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
+          case 0x40 => FieldPolylineMType(name, nullAllowed, xOrig, yOrig, mOrig, xyScale, mScale, metadata)
+          case _ => throw new RuntimeException("Cannot parse polylines with Z value :-(")
+        }
       case 4 | 5 =>
         FieldPolygonType(name, nullAllowed, xOrig, yOrig, xyScale, metadata)
       case _ =>

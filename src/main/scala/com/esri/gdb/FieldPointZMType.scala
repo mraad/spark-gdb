@@ -38,10 +38,10 @@ class FieldPointZMType(name: String,
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)
 
-    val geomType = blob getVarUInt
+    val geomType = blob.getVarUInt
 
-    val vx = blob getVarUInt
-    val vy = blob getVarUInt
+    val vx = blob.getVarUInt()
+    val vy = blob.getVarUInt()
     val x = (vx - 1.0) / xyScale + xOrig
     val y = (vy - 1.0) / xyScale + yOrig
 
@@ -50,18 +50,18 @@ class FieldPointZMType(name: String,
       case 1 => new PointZMType(x, y)
       // PointZ
       case 9 =>
-        val vz = blob getVarUInt
+        val vz = blob.getVarUInt
         val z = (vz - 1.0) / zScale + zOrig
         new PointZMType(x, y, z)
       // PointM
       case 21 =>
-        val vm = blob getVarUInt
+        val vm = blob.getVarUInt
         val m = (vm - 1.0) / mScale + mOrig
         new PointZMType(x, y, 0.0, m)
       // PointZM
       case _ =>
-        val vz = blob getVarUInt
-        val vm = blob getVarUInt
+        val vz = blob.getVarUInt
+        val vm = blob.getVarUInt
         val z = (vz - 1.0) / zScale + zOrig
         val m = (vm - 1.0) / mScale + mOrig
         new PointZMType(x, y, z, m)

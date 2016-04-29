@@ -10,13 +10,8 @@ import org.apache.spark.sql.types.SQLUserDefinedType
   * @param xyArr sequence of xy elements
   */
 @SQLUserDefinedType(udt = classOf[PolylineUDT])
-class PolylineType(override val xmin: Double,
-                   override val ymin: Double,
-                   override val xmax: Double,
-                   override val ymax: Double,
-                   override val xyNum: Array[Int],
-                   override val xyArr: Array[Double]
-                  ) extends PolyType(xmin, ymin, xmax, ymax, xyNum, xyArr) {
+class PolylineType(override val xyNum: Array[Int], override val xyArr: Array[Double])
+  extends PolyType(xyNum, xyArr) {
 
   @transient override lazy val asGeometry: Geometry = {
     val polyline = new Polyline()
@@ -36,21 +31,11 @@ class PolylineType(override val xmin: Double,
     polyline
   }
 
-  override def equals(other: Any): Boolean = other match {
-    case that: PolylineType => equalsType(that)
-    case _ => false
-  }
 }
 
 object PolylineType {
-  def apply(xmin: Double,
-            ymin: Double,
-            xmax: Double,
-            ymax: Double,
-            xyNum: Array[Int],
-            xyArr: Array[Double]
-           ) = {
-    new PolylineType(xmin, ymin, xmax, ymax, xyNum, xyArr)
+  def apply(xyNum: Array[Int], xyArr: Array[Double]) = {
+    new PolylineType(xyNum, xyArr)
   }
 
   def apply(geometry: Geometry) = geometry match {
@@ -59,7 +44,7 @@ object PolylineType {
       line.queryEnvelope2D(envp)
       val xyNum = Array(1)
       val xyArr = Array(line.getEndX, line.getStartY, line.getEndX, line.getEndY)
-      new PolylineType(envp.xmin, envp.ymin, envp.xmax, envp.ymax, xyNum, xyArr)
+      new PolylineType(xyNum, xyArr)
     }
     case multiPath: MultiPath => {
       val envp = new Envelope2D()
@@ -70,19 +55,20 @@ object PolylineType {
       val numPoints = multiPath.getPointCount
       val xyArr = new Array[Double](numPoints * 2)
       var i = 0
-      (0 until numPoints).map(pointIndex => {
+      // TODO - use fold
+      (0 until numPoints).foreach(pointIndex => {
         multiPath.getXY(pointIndex, point2D)
         xyArr(i) = point2D.x
         i += 1
         xyArr(i) = point2D.y
         i += 1
       })
-      new PolylineType(envp.xmin, envp.ymin, envp.xmax, envp.ymax, xyNum, xyArr)
+      new PolylineType(xyNum, xyArr)
     }
-    case _ => throw new RuntimeException(s"PolylineType::cannot create instance from $geometry")
+    case _ => throw new RuntimeException(s"Cannot create instance of PolylineType from $geometry")
   }
 
 
   def unapply(p: PolylineType) =
-    Some((p.xmin, p.ymin, p.xmax, p.ymax, p.xyNum, p.xyArr))
+    Some((p.xyNum, p.xyArr))
 }

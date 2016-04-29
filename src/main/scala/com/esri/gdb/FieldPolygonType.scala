@@ -22,9 +22,9 @@ class FieldPolygonType(name: String,
                        yOrig: Double,
                        xyScale: Double,
                        metadata: Metadata)
-  extends FieldPolyType[PolygonType](name, new PolygonUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
+  extends FieldPoly2Type[PolygonType](name, new PolygonUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
-  override def createPolyType(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]): PolygonType = {
-    PolygonType(xmin, ymin, xmax, ymax, xyNum, xyArr)
+  override def createPolyType(xyNum: Array[Int], xyArr: Array[Double]): PolygonType = {
+    PolygonType(xyNum, xyArr)
   }
 }

@@ -6,6 +6,7 @@ import com.esri.core.geometry.Polygon
 import com.esri.udt.PolygonUDT
 import org.apache.spark.sql.types.{DataType, Metadata}
 
+@deprecated("not used", "0.4")
 object FieldPolygon {
   def apply(name: String,
             nullValueAllowed: Boolean,
@@ -17,6 +18,7 @@ object FieldPolygon {
   }
 }
 
+@deprecated("not used", "0.4")
 abstract class FieldPolygon(name: String,
                             dataType: DataType,
                             nullValueAllowed: Boolean,
@@ -32,7 +34,7 @@ abstract class FieldPolygon(name: String,
 
     val blob = getByteBuffer(byteBuffer)
 
-    val geomType = blob getVarUInt
+    val geomType = blob.getVarUInt
 
     val numPoints = blob.getVarUInt.toInt
     val numParts = blob.getVarUInt.toInt
@@ -66,6 +68,7 @@ abstract class FieldPolygon(name: String,
   }
 }
 
+@deprecated("not used", "0.4")
 class FieldPolygonEsri(name: String,
                        nullValueAllowed: Boolean,
                        xOrig: Double,

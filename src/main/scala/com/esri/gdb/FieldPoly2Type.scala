@@ -6,19 +6,19 @@ import org.apache.spark.sql.types.{DataType, Metadata}
 
 /**
   */
-abstract class FieldPolyType[T](name: String,
-                                dataType: DataType,
-                                nullValueAllowed: Boolean,
-                                xOrig: Double,
-                                yOrig: Double,
-                                xyScale: Double,
-                                metadata: Metadata)
+abstract class FieldPoly2Type[T](name: String,
+                                 dataType: DataType,
+                                 nullValueAllowed: Boolean,
+                                 xOrig: Double,
+                                 yOrig: Double,
+                                 xyScale: Double,
+                                 metadata: Metadata)
   extends FieldBytes(name, dataType, nullValueAllowed, metadata) {
 
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)
 
-    val geomType = blob getVarUInt
+    val geomType = blob.getVarUInt
 
     val numPoints = blob.getVarUInt.toInt
     val numParts = blob.getVarUInt.toInt
@@ -75,8 +75,8 @@ abstract class FieldPolyType[T](name: String,
         i += 1
       })
     }
-    createPolyType(xmin, ymin, xmax, ymax, xyNum, xyArr)
+    createPolyType(xyNum, xyArr)
   }
 
-  def createPolyType(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]): T
+  def createPolyType(xyNum: Array[Int], xyArr: Array[Double]): T
 }

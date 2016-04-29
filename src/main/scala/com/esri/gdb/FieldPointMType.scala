@@ -34,11 +34,11 @@ class FieldPointMType(name: String,
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)
 
-    val geomType = blob getVarUInt
+    val geomType = blob.getVarUInt()
 
-    val vx = blob getVarUInt
-    val vy = blob getVarUInt
-    val vm = blob getVarUInt
+    val vx = blob.getVarUInt
+    val vy = blob.getVarUInt
+    val vm = blob.getVarUInt
 
     val x = (vx - 1.0) / xyScale + xOrig
     val y = (vy - 1.0) / xyScale + yOrig

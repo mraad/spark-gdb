@@ -6,6 +6,7 @@ import com.esri.core.geometry.Polyline
 import com.esri.udt.PolylineUDT
 import org.apache.spark.sql.types.Metadata
 
+@deprecated("not used", "0.4")
 object FieldPolyline extends Serializable {
   def apply(name: String,
             nullValueAllowed: Boolean,
@@ -17,6 +18,7 @@ object FieldPolyline extends Serializable {
   }
 }
 
+@deprecated("not used", "0.4")
 class FieldPolyline(name: String,
                     nullValueAllowed: Boolean,
                     xOrig: Double,
@@ -30,7 +32,7 @@ class FieldPolyline(name: String,
     val polyline = new Polyline()
 
     val blob = getByteBuffer(byteBuffer)
-    val geomType = blob getVarUInt
+    val geomType = blob.getVarUInt
 
     val numPoints = blob.getVarUInt.toInt
     val numParts = blob.getVarUInt.toInt

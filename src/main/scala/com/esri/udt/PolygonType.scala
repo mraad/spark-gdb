@@ -1,6 +1,6 @@
 package com.esri.udt
 
-import com.esri.core.geometry.{Envelope2D, Geometry, Point2D, Polygon}
+import com.esri.core.geometry.{Geometry, Point2D, Polygon}
 import org.apache.spark.sql.types.SQLUserDefinedType
 
 /**
@@ -10,13 +10,7 @@ import org.apache.spark.sql.types.SQLUserDefinedType
   * @param xyArr sequence of xy elements
   */
 @SQLUserDefinedType(udt = classOf[PolygonUDT])
-class PolygonType(override val xmin: Double,
-                  override val ymin: Double,
-                  override val xmax: Double,
-                  override val ymax: Double,
-                  override val xyNum: Array[Int],
-                  override val xyArr: Array[Double]
-                 ) extends PolyType(xmin, ymin, xmax, ymax, xyNum, xyArr) {
+class PolygonType(override val xyNum: Array[Int], override val xyArr: Array[Double]) extends PolyType(xyNum, xyArr) {
 
   @transient override lazy val asGeometry: Geometry = {
     val polygon = new Polygon()
@@ -33,48 +27,41 @@ class PolygonType(override val xmin: Double,
         }
       })
     })
+    polygon.closeAllPaths()
     polygon
-  }
-
-  override def equals(other: Any): Boolean = other match {
-    case that: PolygonType => equalsType(that)
-    case _ => false
   }
 }
 
 object PolygonType {
-  def apply(xmin: Double,
-            ymin: Double,
-            xmax: Double,
-            ymax: Double,
-            xyNum: Array[Int],
-            xyArr: Array[Double]
-           ) = {
-    new PolygonType(xmin, ymin, xmax, ymax, xyNum, xyArr)
+  def apply(xyNum: Array[Int], xyArr: Array[Double]) = {
+    new PolygonType(xyNum, xyArr)
   }
 
   def apply(geometry: Geometry) = geometry match {
     case polygon: Polygon => {
-      val envp = new Envelope2D()
-      polygon.queryEnvelope2D(envp)
+      /*
+            val envp = new Envelope2D()
+            polygon.queryEnvelope2D(envp)
+      */
       val pathCount = polygon.getPathCount
       val xyNum = (0 until pathCount).map(pathIndex => polygon.getPathSize(pathIndex)).toArray
       val point2D = new Point2D()
       val numPoints = polygon.getPointCount
       val xyArr = new Array[Double](numPoints * 2)
       var i = 0
-      (0 until numPoints).map(pointIndex => {
+      // TODO - use fold
+      (0 until numPoints).foreach(pointIndex => {
         polygon.getXY(pointIndex, point2D)
         xyArr(i) = point2D.x
         i += 1
         xyArr(i) = point2D.y
         i += 1
       })
-      new PolygonType(envp.xmin, envp.ymin, envp.xmax, envp.ymax, xyNum, xyArr)
+      new PolygonType(xyNum, xyArr)
     }
-    case _ => throw new RuntimeException(s"PolygonType::cannot create instance from $geometry")
+    case _ => throw new RuntimeException(s"Cannot create instance of PolygonType from $geometry")
   }
 
   def unapply(p: PolygonType) =
-    Some((p.xmin, p.ymin, p.xmax, p.ymax, p.xyNum, p.xyArr))
+    Some((p.xyNum, p.xyArr))
 }

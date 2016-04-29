@@ -1,8 +1,9 @@
 package com.esri.gdb
 
-import com.esri.udt.{PointType, PolygonType, PolylineType}
-import org.apache.spark.SparkContext
+import com.esri.core.geometry.Envelope2D
+import com.esri.udt.{PointType, PolygonType, PolylineMType, PolylineType}
 import org.apache.spark.sql.{DataFrame, SQLContext}
+import org.apache.spark.{SparkConf, SparkContext}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
@@ -14,7 +15,7 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    sc = new SparkContext("local[2]", "GDBSuite")
+    sc = new SparkContext("local[2]", "GDBSuite", new SparkConf())
     sqlContext = new SQLContext(sc)
   }
 
@@ -90,6 +91,56 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
     })
   }
 
+  test("MLines") {
+    doMLines(sqlContext.gdbFile(gdbPath, "MLines", 2))
+  }
+
+  def doMLines(dataFrame: DataFrame): Unit = {
+    val metadata = dataFrame.schema("Shape").metadata
+    val xyTolerance = metadata.getDouble("xyTolerance")
+    val mTolerance = metadata.getDouble("mTolerance")
+
+    val results = dataFrame.select("Shape",
+      "X1", "Y1", "M1",
+      "X2", "Y2", "M2",
+      "X3", "Y3", "M3",
+      "RID",
+      "OBJECTID")
+    results.collect.foreach(row => {
+      val polyline = row.getAs[PolylineMType](0)
+      val x1 = row.getDouble(1)
+      val y1 = row.getDouble(2)
+      val m1 = row.getDouble(3)
+      val x2 = row.getDouble(4)
+      val y2 = row.getDouble(5)
+      val m2 = row.getDouble(6)
+      val x3 = row.getDouble(7)
+      val y3 = row.getDouble(8)
+      val m3 = row.getDouble(9)
+      val rid = row.getInt(10)
+      val oid = row.getInt(11)
+
+      assert(rid === oid)
+
+      assert(polyline.xyNum.length === 1)
+      assert(polyline.xyNum(0) === 3)
+
+      assert(polyline.xyArr.length === 9)
+
+      assert((polyline.xyArr(0) - x1).abs <= xyTolerance)
+      assert((polyline.xyArr(1) - y1).abs <= xyTolerance)
+      assert((polyline.xyArr(2) - m1).abs <= mTolerance)
+
+      assert((polyline.xyArr(3) - x2).abs <= xyTolerance)
+      assert((polyline.xyArr(4) - y2).abs <= xyTolerance)
+      assert((polyline.xyArr(5) - m2).abs <= mTolerance)
+
+      assert((polyline.xyArr(6) - x3).abs <= xyTolerance)
+      assert((polyline.xyArr(7) - y3).abs <= xyTolerance)
+      assert((polyline.xyArr(8) - m3).abs <= mTolerance)
+    })
+  }
+
   test("Polygons") {
     doPolygons(sqlContext.gdbFile(gdbPath, "Polygons", 2))
   }
@@ -111,11 +162,14 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
       val rid = row.getInt(5)
       val oid = row.getInt(6)
 
-      assert((polygon.xmin - x1).abs <= xyTolerance)
-      assert((polygon.ymin - y1).abs <= xyTolerance)
+      val envp = new Envelope2D()
+      polygon.asGeometry.queryEnvelope2D(envp)
 
-      assert((polygon.xmax - x2).abs <= xyTolerance)
-      assert((polygon.ymax - y2).abs <= xyTolerance)
+      assert((envp.xmin - x1).abs < xyTolerance)
+      assert((envp.ymin - y1).abs < xyTolerance)
+
+      assert((envp.xmax - x2).abs < xyTolerance)
+      assert((envp.ymax - y2).abs < xyTolerance)
 
       assert(rid === oid)
     })

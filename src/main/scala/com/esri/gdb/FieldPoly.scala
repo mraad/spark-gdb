@@ -5,6 +5,7 @@ import java.nio.ByteBuffer
 import com.esri.core.geometry.MultiPath
 import org.apache.spark.sql.types.{DataType, Metadata}
 
+@deprecated("not used", "0.4")
 abstract class FieldPoly(name: String,
                          dataType: DataType,
                          nullValueAllowed: Boolean,
