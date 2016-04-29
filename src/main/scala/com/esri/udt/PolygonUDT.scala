@@ -8,14 +8,14 @@ class PolygonUDT extends PolyUDT[PolygonType] {
 
   override def serialize(obj: Any): InternalRow = {
     obj match {
-      case PolygonType(xyNum, xyArr) => {
-        serialize(xyNum, xyArr)
+      case PolygonType(xmin, ymin, xmax, ymax, xyNum, xyArr) => {
+        serialize(xmin, ymin, xmax, ymax, xyNum, xyArr)
       }
     }
   }
 
-  override def deserialize(xyNum: Array[Int], xyArr: Array[Double]) = {
-    PolygonType(xyNum, xyArr)
+  override def deserialize(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]) = {
+    PolygonType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 
   override def userClass = classOf[PolygonType]

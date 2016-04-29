@@ -81,8 +81,8 @@ abstract class FieldPoly3Type[T](name: String,
       xyArr(i) = dn / nScale + nOrig
       i += 3
     })
-    createPolyMType(xyNum, xyArr)
+    createPolyMType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 
-  def createPolyMType(xyNum: Array[Int], xyArr: Array[Double]): T
+  def createPolyMType(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]): T
 }

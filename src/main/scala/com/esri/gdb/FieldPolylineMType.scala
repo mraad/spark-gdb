@@ -28,7 +28,7 @@ class FieldPolylineMType(name: String,
                          metadata: Metadata)
   extends FieldPoly3Type[PolylineMType](name, new PolylineMUDT(), nullValueAllowed, xOrig, yOrig, mOrig, xyScale, mScale, metadata) {
 
-  override def createPolyMType(xyNum: Array[Int], xyArr: Array[Double]) = {
-    PolylineMType(xyNum, xyArr)
+  override def createPolyMType(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]) = {
+    PolylineMType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 }

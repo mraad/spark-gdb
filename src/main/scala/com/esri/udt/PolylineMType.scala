@@ -10,8 +10,14 @@ import org.apache.spark.sql.types.SQLUserDefinedType
   * @param xyArr sequence of xy elements
   */
 @SQLUserDefinedType(udt = classOf[PolylineMUDT])
-class PolylineMType(override val xyNum: Array[Int], override val xyArr: Array[Double])
-  extends PolyType(xyNum, xyArr) {
+class PolylineMType(
+                     override val xmin: Double,
+                     override val ymin: Double,
+                     override val xmax: Double,
+                     override val ymax: Double,
+                     override val xyNum: Array[Int],
+                     override val xyArr: Array[Double])
+  extends PolyType(xmin, ymin, xmax, ymax, xyNum, xyArr) {
 
   @transient override lazy val asGeometry: Geometry = {
     val polyline = new Polyline()
@@ -35,12 +41,14 @@ class PolylineMType(override val xyNum: Array[Int], override val xyArr: Array[Do
 }
 
 object PolylineMType {
-  def apply(xyNum: Array[Int], xyArr: Array[Double]) = {
-    new PolylineMType(xyNum, xyArr)
+  def apply(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]) = {
+    new PolylineMType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 
   def apply(geometry: Geometry) = geometry match {
     case multiPath: MultiPath => {
+      val envp = new Envelope2D()
+      multiPath.queryEnvelope2D(envp)
       val pathCount = multiPath.getPathCount
       val xyNum = (0 until pathCount).map(pathIndex => multiPath.getPathSize(pathIndex)).toArray
       val numPoints = multiPath.getPointCount
@@ -53,11 +61,11 @@ object PolylineMType {
         xyArr(i + 2) = point.getM
         i + 3
       })
-      new PolylineMType(xyNum, xyArr)
+      new PolylineMType(envp.xmin, envp.ymin, envp.xmax, envp.ymax, xyNum, xyArr)
     }
     case _ => throw new RuntimeException(s"Cannot create instance of PolylineMType from $geometry")
   }
 
   def unapply(p: PolylineMType) =
-    Some((p.xyNum, p.xyArr))
+    Some((p.xmin, p.ymin, p.xmax, p.ymax, p.xyNum, p.xyArr))
 }

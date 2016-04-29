@@ -75,8 +75,8 @@ abstract class FieldPoly2Type[T](name: String,
         i += 1
       })
     }
-    createPolyType(xyNum, xyArr)
+    createPolyType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 
-  def createPolyType(xyNum: Array[Int], xyArr: Array[Double]): T
+  def createPolyType(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]): T
 }

@@ -24,7 +24,7 @@ class FieldPolylineType(name: String,
                         metadata: Metadata)
   extends FieldPoly2Type[PolylineType](name, new PolylineUDT(), nullValueAllowed, xOrig, yOrig, xyScale, metadata) {
 
-  override def createPolyType(xyNum: Array[Int], xyArr: Array[Double]): PolylineType = {
-    PolylineType(xyNum, xyArr)
+  override def createPolyType(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]): PolylineType = {
+    PolylineType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 }

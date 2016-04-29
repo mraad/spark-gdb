@@ -10,8 +10,13 @@ import org.apache.spark.sql.types.SQLUserDefinedType
   * @param xyArr sequence of xy elements
   */
 @SQLUserDefinedType(udt = classOf[PolylineUDT])
-class PolylineType(override val xyNum: Array[Int], override val xyArr: Array[Double])
-  extends PolyType(xyNum, xyArr) {
+class PolylineType(override val xmin: Double,
+                   override val ymin: Double,
+                   override val xmax: Double,
+                   override val ymax: Double,
+                   override val xyNum: Array[Int],
+                   override val xyArr: Array[Double])
+  extends PolyType(xmin, ymin, xmax, ymax, xyNum, xyArr) {
 
   @transient override lazy val asGeometry: Geometry = {
     val polyline = new Polyline()
@@ -34,8 +39,8 @@ class PolylineType(override val xyNum: Array[Int], override val xyArr: Array[Dou
 }
 
 object PolylineType {
-  def apply(xyNum: Array[Int], xyArr: Array[Double]) = {
-    new PolylineType(xyNum, xyArr)
+  def apply(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]) = {
+    new PolylineType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 
   def apply(geometry: Geometry) = geometry match {
@@ -44,7 +49,7 @@ object PolylineType {
       line.queryEnvelope2D(envp)
       val xyNum = Array(1)
       val xyArr = Array(line.getEndX, line.getStartY, line.getEndX, line.getEndY)
-      new PolylineType(xyNum, xyArr)
+      new PolylineType(envp.xmin, envp.ymin, envp.xmax, envp.ymax, xyNum, xyArr)
     }
     case multiPath: MultiPath => {
       val envp = new Envelope2D()
@@ -63,12 +68,11 @@ object PolylineType {
         xyArr(i) = point2D.y
         i += 1
       })
-      new PolylineType(xyNum, xyArr)
+      new PolylineType(envp.xmin, envp.ymin, envp.xmax, envp.ymax, xyNum, xyArr)
     }
     case _ => throw new RuntimeException(s"Cannot create instance of PolylineType from $geometry")
   }
 
-
   def unapply(p: PolylineType) =
-    Some((p.xyNum, p.xyArr))
+    Some((p.xmin, p.ymin, p.xmax, p.ymax, p.xyNum, p.xyArr))
 }

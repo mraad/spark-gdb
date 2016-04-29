@@ -8,12 +8,12 @@ class PolylineUDT extends PolyUDT[PolylineType] {
 
   override def serialize(obj: Any): InternalRow = {
     obj match {
-      case PolylineType(xyNum, xyArr) => serialize(xyNum, xyArr)
+      case PolylineType(xmin, ymin, xmax, ymax, xyNum, xyArr) => serialize(xmin, ymin, xmax, ymax, xyNum, xyArr)
     }
   }
 
-  override def deserialize(xyNum: Array[Int], xyArr: Array[Double]) = {
-    PolylineType(xyNum, xyArr)
+  override def deserialize(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]) = {
+    PolylineType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 
   override def userClass = classOf[PolylineType]

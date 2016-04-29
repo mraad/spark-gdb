@@ -6,15 +6,13 @@ import org.apache.spark.sql.types.SQLUserDefinedType
 /**
   */
 @SQLUserDefinedType(udt = classOf[PointZUDT])
-class PointZType(val x: Double = 0.0, val y: Double = 0.0, val m: Double = 0.0) extends SpatialType {
+class PointZType(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0) extends SpatialType {
 
   @transient lazy override val asGeometry = {
-    val p = new Point(x, y)
-    p.setM(m)
-    p
+    new Point(x, y, z)
   }
 
-  def ==(that: PointZType) = this.x == that.x && this.y == that.y && this.m == that.m
+  def ==(that: PointZType) = this.x == that.x && this.y == that.y && this.z == that.z
 
   override def equals(other: Any): Boolean = other match {
     case that: PointZType => this == that
@@ -22,13 +20,13 @@ class PointZType(val x: Double = 0.0, val y: Double = 0.0, val m: Double = 0.0) 
   }
 
   override def hashCode(): Int = {
-    Seq(x, y, m).foldLeft(0)((a, b) => {
+    Seq(x, y, z).foldLeft(0)((a, b) => {
       val bits = java.lang.Double.doubleToLongBits(b)
       31 * a + (bits ^ (bits >>> 32)).toInt
     })
   }
 
-  override def toString = s"PointZType($x,$y,$m)"
+  override def toString = s"PointZType($x,$y,$z)"
 
 }
 
@@ -36,10 +34,9 @@ object PointZType {
   def apply(geometry: Geometry) = geometry match {
     case point: Point => new PointZType(point.getX, point.getY, point.getM)
     case _ => throw new RuntimeException(s"Cannot construct PointZType from ${geometry.toString}")
-
   }
 
-  def apply(x: Double, y: Double, m: Double) = new PointZType(x, y, m)
+  def apply(x: Double, y: Double, z: Double) = new PointZType(x, y, z)
 
-  def unapply(p: PointZType) = Some((p.x, p.y, p.m))
+  def unapply(p: PointZType) = Some((p.x, p.y, p.z))
 }

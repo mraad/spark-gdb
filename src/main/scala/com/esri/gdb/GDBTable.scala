@@ -278,8 +278,6 @@ object GDBTable {
 
     val metadata = metadataBuilder.build()
 
-    // println(s"geometryType=$geometryType geometryProp=$geometryProp")
-
     // TODO - more shapes, Z and M
     geometryType match {
       case 1 =>

@@ -27,7 +27,7 @@ class FieldPointType(name: String,
   override def readValue(byteBuffer: ByteBuffer, oid: Int) = {
     val blob = getByteBuffer(byteBuffer)
 
-    val geomType = blob.getVarUInt()
+    blob.getVarUInt() // geomType
 
     val vx = blob.getVarUInt()
     val vy = blob.getVarUInt()
