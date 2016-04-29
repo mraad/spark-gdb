@@ -261,9 +261,6 @@ object GDBTable {
         numes += bb.getDouble
       }
     }
-    // numes.foreach(println)
-
-    // println(s"$zOrig $zScale $zTolerance $mOrig $mScale $mTolerance")
 
     val metadataBuilder = new MetadataBuilder()
       .putString("alias", alias)
