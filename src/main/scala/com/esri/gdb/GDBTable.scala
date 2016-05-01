@@ -19,7 +19,7 @@ class GDBTable(dataBuffer: DataBuffer,
   def schema() = StructType(fields)
 
   def rowIterator(index: GDBIndex, startAtRow: Int = 0, numRowsToRead: Int = -1) = {
-    log.info(s"rowIterator::starting at row $startAtRow and reading $numRowsToRead rows")
+    // log.info(s"rowIterator::startAtRow=$startAtRow numRowsToRead=$numRowsToRead")
     new GDBRowIterator(index.iterator(startAtRow, numRowsToRead), dataBuffer, fields, schema)
   }
 
@@ -44,7 +44,7 @@ class GDBTable(dataBuffer: DataBuffer,
 
 }
 
-object GDBTable {
+object GDBTable extends Logging with Serializable {
   def apply(path: String, name: String, conf: Configuration = new Configuration()) = {
     val filename = StringBuilder.newBuilder.append(path).append(File.separator).append(name).append(".gdbtable").toString()
     val hdfsPath = new Path(filename)
@@ -305,13 +305,9 @@ object GDBTable {
     try {
       val table = GDBTable(path, "a00000001", conf)
       try {
-        table
-          .seekIterator(index.iterator())
-          .map(row => {
-            val id = row("ID")
-            val name = row("Name")
-            CatRow(id.asInstanceOf[Int], name.asInstanceOf[String])
-          })
+        val idxID = table.fields.indexWhere(_.name == "ID")
+        val idxName = table.fields.indexWhere(_.name == "Name")
+        table.rowIterator(index).map(row => CatRow(row.getInt(idxID), row.getString(idxName))).toSeq
       }
       finally {
         table.close()
@@ -322,7 +318,7 @@ object GDBTable {
   }
 
   def findTable(path: String, tableName: String, conf: Configuration = new Configuration()) = {
-    // TODO - implement Scala ARM
+    // log.info(s"findTable::$tableName")
     val index = GDBIndex(path, "a00000001", conf)
     try {
       val table = GDBTable(path, "a00000001", conf)
@@ -330,11 +326,7 @@ object GDBTable {
         table
           .seekIterator(index.iterator())
           .find(row => row("Name") == tableName)
-          .map(row => {
-            val id = row("ID")
-            val name = row("Name")
-            CatRow(id.asInstanceOf[Int], name.asInstanceOf[String])
-          })
+          .map(row => CatRow(row("ID").asInstanceOf[Int], row("Name").asInstanceOf[String]))
       }
       finally {
         table.close()

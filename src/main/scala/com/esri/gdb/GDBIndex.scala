@@ -5,6 +5,7 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FSDataInputStream, Path}
+import org.apache.spark.Logging
 
 object GDBIndex {
   def apply(path: String, name: String, conf: Configuration = new Configuration()) = {
@@ -28,7 +29,7 @@ object GDBIndex {
 private[gdb] class GDBIndex(dataInput: FSDataInputStream,
                             val numRows: Int,
                             indexSize: Int
-                           ) extends AutoCloseable with Serializable {
+                           ) extends Logging with AutoCloseable with Serializable {
 
   def readSeekForRowNum(rowNum: Int) = {
     val bytes = new Array[Byte](indexSize)
@@ -40,6 +41,7 @@ private[gdb] class GDBIndex(dataInput: FSDataInputStream,
   def iterator(startAtRow: Int = 0, numRowsToRead: Int = -1) = {
     dataInput.seek(16 + startAtRow * indexSize)
     val maxRows = if (numRowsToRead == -1) numRows else numRowsToRead
+    // log.info(s"iterator::startAtRow=$startAtRow maxRows=$maxRows")
     new GDBIndexIterator(dataInput, startAtRow, maxRows, indexSize).withFilter(_.isSeekable)
   }
 
@@ -52,7 +54,7 @@ private[gdb] class GDBIndexIterator(dataInput: DataInput,
                                     startID: Int,
                                     maxRows: Int,
                                     indexSize: Int
-                                   ) extends Iterator[IndexInfo] with Serializable {
+                                   ) extends Iterator[IndexInfo] with Logging with Serializable {
 
   private val indexInfo = IndexInfo(0, 0)
   private val bytes = new Array[Byte](indexSize)
@@ -64,6 +66,7 @@ private[gdb] class GDBIndexIterator(dataInput: DataInput,
   def hasNext() = nextRow < maxRows
 
   def next() = {
+    // log.info(s"next::nextRow=$nextRow maxRows=$maxRows")
     nextRow += 1
 
     objectID += 1
