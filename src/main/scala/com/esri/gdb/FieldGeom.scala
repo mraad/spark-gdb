@@ -4,7 +4,7 @@ import org.apache.spark.sql.types.{DataType, Metadata}
 
 /**
   */
-@deprecated("use FieldBytes insteadn", "0.4")
+@deprecated("use FieldBytes instead", "0.4")
 abstract class FieldGeom(name: String,
                          dataType: DataType,
                          nullValueAllowed: Boolean,

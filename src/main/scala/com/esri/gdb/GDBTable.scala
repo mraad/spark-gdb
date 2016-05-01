@@ -300,6 +300,27 @@ object GDBTable {
     }
   }
 
+  def listTables(path: String, conf: Configuration = new Configuration()) = {
+    val index = GDBIndex(path, "a00000001", conf)
+    try {
+      val table = GDBTable(path, "a00000001", conf)
+      try {
+        table
+          .seekIterator(index.iterator())
+          .map(row => {
+            val id = row("ID")
+            val name = row("Name")
+            CatRow(id.asInstanceOf[Int], name.asInstanceOf[String])
+          })
+      }
+      finally {
+        table.close()
+      }
+    } finally {
+      index.close()
+    }
+  }
+
   def findTable(path: String, tableName: String, conf: Configuration = new Configuration()) = {
     // TODO - implement Scala ARM
     val index = GDBIndex(path, "a00000001", conf)
