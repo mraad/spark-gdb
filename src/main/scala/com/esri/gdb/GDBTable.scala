@@ -307,7 +307,7 @@ object GDBTable extends Logging with Serializable {
       try {
         val idxID = table.fields.indexWhere(_.name == "ID")
         val idxName = table.fields.indexWhere(_.name == "Name")
-        table.rowIterator(index).map(row => CatRow(row.getInt(idxID), row.getString(idxName))).toSeq
+        table.rowIterator(index).map(row => CatRow(row.getInt(idxID), row.getString(idxName))).toArray
       }
       finally {
         table.close()
