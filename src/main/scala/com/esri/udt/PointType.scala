@@ -8,7 +8,7 @@ import org.apache.spark.sql.types.SQLUserDefinedType
 @SQLUserDefinedType(udt = classOf[PointUDT])
 class PointType(val x: Double = 0.0, val y: Double = 0.0) extends SpatialType {
 
-  @transient lazy override val asGeometry = new Point(x, y)
+  /*@transient lazy override val*/ def asGeometry() = new Point(x, y)
 
   def ==(that: PointType) = this.x == that.x && this.y == that.y
 

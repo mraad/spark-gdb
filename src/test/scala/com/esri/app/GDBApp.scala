@@ -4,20 +4,20 @@ import com.esri.gdb.{GDBIndex, GDBTable}
 import resource._
 
 object GDBApp extends App {
-  val gdb = "/Users/mraad_admin/GWorkspace/spark-gdb/src/test/resources/Test.gdb"
+  val gdb = "/Volumes/SSD512G/TXData/2014/TXDOT_Roadway_Inventory.gdb"
 
-  GDBTable.listTables(gdb).foreach(println)
+  /// GDBTable.listTables(gdb).foreach(println)
 
-  // doCat
+  doCat
 
   def doCat: Unit = {
-    GDBTable.findTable(gdb, "MLines")
+    GDBTable.findTable(gdb, "TXDOT_Roadway_Linework_Routed")
       .foreach(catTab => {
         for {
           index <- managed(GDBIndex(gdb, catTab.hexName))
           table <- managed(GDBTable(gdb, catTab.hexName))
         } {
-          table.rowIterator(index).foreach(println)
+          table.seekIterator(index.iterator()).take(10).foreach(println)
         }
       })
   }

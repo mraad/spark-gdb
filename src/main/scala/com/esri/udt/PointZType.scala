@@ -8,7 +8,9 @@ import org.apache.spark.sql.types.SQLUserDefinedType
 @SQLUserDefinedType(udt = classOf[PointZUDT])
 class PointZType(val x: Double = 0.0, val y: Double = 0.0, val z: Double = 0.0) extends SpatialType {
 
-  @transient lazy override val asGeometry = {
+  /*@transient lazy override val*/ def asGeometry() = asPoint()
+
+  def asPoint() = {
     new Point(x, y, z)
   }
 

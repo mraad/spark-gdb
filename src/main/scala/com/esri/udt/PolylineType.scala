@@ -18,7 +18,9 @@ class PolylineType(override val xmin: Double,
                    override val xyArr: Array[Double])
   extends PolyType(xmin, ymin, xmax, ymax, xyNum, xyArr) {
 
-  @transient override lazy val asGeometry: Geometry = {
+  /*@transient override lazy val*/ def asGeometry(): Geometry = asPolyline()
+
+  def asPolyline() = {
     val polyline = new Polyline()
     var i = 0
     xyNum.foreach(p => {

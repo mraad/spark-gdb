@@ -18,7 +18,9 @@ class PolygonType(override val xmin: Double,
                   override val xyArr: Array[Double])
   extends PolyType(xmin, ymin, xmax, ymax, xyNum, xyArr) {
 
-  @transient override lazy val asGeometry: Geometry = {
+  /*@transient override lazy val*/ def asGeometry(): Geometry = asPolygon()
+
+  def asPolygon() = {
     val polygon = new Polygon()
     var i = 0
     xyNum.foreach(p => {

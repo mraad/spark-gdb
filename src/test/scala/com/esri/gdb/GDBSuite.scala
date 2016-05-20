@@ -15,7 +15,12 @@ class GDBSuite extends FunSuite with BeforeAndAfterAll {
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
-    sc = new SparkContext("local[2]", "GDBSuite", new SparkConf())
+    val config = new SparkConf()
+      .setMaster("local")
+      .setAppName("GDBSuite")
+      .set("spark.ui.enabled", "false")
+      .set("spark.ui.showConsoleProgress", "false")
+    sc = new SparkContext(config)
     sqlContext = new SQLContext(sc)
   }
 
