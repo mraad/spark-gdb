@@ -21,67 +21,73 @@ abstract class FieldPoly3Type[T](name: String,
     val blob = getByteBuffer(byteBuffer)
 
     val geomType = blob.getVarUInt
-
     val numPoints = blob.getVarUInt.toInt
-    val numParts = blob.getVarUInt.toInt
-
-    val xmin = blob.getVarUInt / xyScale + xOrig
-    val ymin = blob.getVarUInt / xyScale + yOrig
-    val xmax = blob.getVarUInt / xyScale + xmin
-    val ymax = blob.getVarUInt / xyScale + ymin
-
-    var dx = 0L
-    var dy = 0L
-
-    val xyNum = new Array[Int](numParts)
-    val xyArr = new Array[Double](numPoints * 3)
-
-    var i = 0
-    if (numParts > 1) {
-      var sum = 0
-      1 to numParts foreach (partIndex => {
-        if (partIndex == numParts) {
-          xyNum(i) = numPoints - sum
-        } else {
-          val numXY = blob.getVarUInt.toInt
-          xyNum(i) = numXY
-          sum += numXY
-          i += 1
-        }
-      })
-      i = 0
-      xyNum.foreach(numXY => {
-        0 until numXY foreach (_ => {
-          dx += blob.getVarInt
-          dy += blob.getVarInt
-          val x = dx / xyScale + xOrig
-          val y = dy / xyScale + yOrig
-          xyArr(i) = x
-          i += 1
-          xyArr(i) = y
-          i += 2
-        })
-      })
+    // println(s"geomType=$geomType numPoints=$numPoints")
+    // TODO - Handle zero num points in other geom type.
+    if (numPoints == 0) {
+      createPolyMType(0, 0, 0, 0, Array.empty[Int], Array.empty[Double])
     }
     else {
-      xyNum(0) = numPoints
+      val numParts = blob.getVarUInt.toInt
+
+      val xmin = blob.getVarUInt / xyScale + xOrig
+      val ymin = blob.getVarUInt / xyScale + yOrig
+      val xmax = blob.getVarUInt / xyScale + xmin
+      val ymax = blob.getVarUInt / xyScale + ymin
+
+      var dx = 0L
+      var dy = 0L
+
+      val xyNum = new Array[Int](numParts)
+      val xyArr = new Array[Double](numPoints * 3)
+
+      var i = 0
+      if (numParts > 1) {
+        var sum = 0
+        1 to numParts foreach (partIndex => {
+          if (partIndex == numParts) {
+            xyNum(i) = numPoints - sum
+          } else {
+            val numXY = blob.getVarUInt.toInt
+            xyNum(i) = numXY
+            sum += numXY
+            i += 1
+          }
+        })
+        i = 0
+        xyNum.foreach(numXY => {
+          0 until numXY foreach (_ => {
+            dx += blob.getVarInt
+            dy += blob.getVarInt
+            val x = dx / xyScale + xOrig
+            val y = dy / xyScale + yOrig
+            xyArr(i) = x
+            i += 1
+            xyArr(i) = y
+            i += 2
+          })
+        })
+      }
+      else {
+        xyNum(0) = numPoints
+        0 until numPoints foreach (_ => {
+          dx += blob.getVarInt
+          dy += blob.getVarInt
+          xyArr(i) = dx / xyScale + xOrig
+          i += 1
+          xyArr(i) = dy / xyScale + yOrig
+          i += 2
+        })
+      }
+      i = 2
+      var dn = 0L
       0 until numPoints foreach (_ => {
-        dx += blob.getVarInt
-        dy += blob.getVarInt
-        xyArr(i) = dx / xyScale + xOrig
-        i += 1
-        xyArr(i) = dy / xyScale + yOrig
-        i += 2
+        dn += blob.getVarInt
+        xyArr(i) = dn / nScale + nOrig
+        i += 3
       })
+      createPolyMType(xmin, ymin, xmax, ymax, xyNum, xyArr)
     }
-    i = 2
-    var dn = 0L
-    0 until numPoints foreach (_ => {
-      dn += blob.getVarInt
-      xyArr(i) = dn / nScale + nOrig
-      i += 3
-    })
-    createPolyMType(xmin, ymin, xmax, ymax, xyNum, xyArr)
   }
 
   def createPolyMType(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]): T

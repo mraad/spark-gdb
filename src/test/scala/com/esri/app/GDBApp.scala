@@ -17,7 +17,10 @@ object GDBApp extends App {
           index <- managed(GDBIndex(gdb, catTab.hexName))
           table <- managed(GDBTable(gdb, catTab.hexName))
         } {
-          table.seekIterator(index.iterator()).take(10).foreach(println)
+          val count = table
+            .seekIterator(index.iterator())
+            .count(m => true)
+          println(count)
         }
       })
   }
