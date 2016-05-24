@@ -19,19 +19,18 @@ abstract class PolyUDT[T] extends UserDefinedType[T] {
 
   def serialize(xmin: Double, ymin: Double, xmax: Double, ymax: Double, xyNum: Array[Int], xyArr: Array[Double]) = {
     val row = new GenericMutableRow(6)
-    /* Spark 1.5
-    row.update(4, new GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
-    row.update(5, new GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
-    */
-    /*
-        For Spark 1.6
-    */
     row.update(0, xmin)
     row.update(1, ymin)
     row.update(2, xmax)
     row.update(3, ymax)
+    // For Spark 1.6
+    /*
     row.update(4, new org.apache.spark.sql.catalyst.util.GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
     row.update(5, new org.apache.spark.sql.catalyst.util.GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
+    */
+    // Spark 1.5
+    row.update(4, new GenericArrayData(xyNum.map(_.asInstanceOf[Any])))
+    row.update(5, new GenericArrayData(xyArr.map(_.asInstanceOf[Any])))
     row
   }
 

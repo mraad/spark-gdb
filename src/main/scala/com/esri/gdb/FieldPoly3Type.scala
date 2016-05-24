@@ -4,8 +4,6 @@ import java.nio.ByteBuffer
 
 import org.apache.spark.sql.types.{DataType, Metadata}
 
-/**
-  */
 abstract class FieldPoly3Type[T](name: String,
                                  dataType: DataType,
                                  nullValueAllowed: Boolean,
@@ -22,7 +20,6 @@ abstract class FieldPoly3Type[T](name: String,
 
     val geomType = blob.getVarUInt
     val numPoints = blob.getVarUInt.toInt
-    // println(s"geomType=$geomType numPoints=$numPoints")
     // TODO - Handle zero num points in other geom type.
     if (numPoints == 0) {
       createPolyMType(0, 0, 0, 0, Array.empty[Int], Array.empty[Double])
