@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.esri</groupId>
-    <artifactId>spark-gdb</artifactId>
+    <artifactId>spark-gdb_${spark.version}</artifactId>
     <version>0.6</version>
     <packaging>jar</packaging>
 
@@ -93,7 +93,9 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}-${spark.version}-${project.version}</finalName>
+        <!--
+                <finalName>${project.artifactId}-${spark.version}-${project.version}</finalName>
+        -->
         <pluginManagement>
             <plugins>
                 <plugin>
