@@ -93,7 +93,7 @@
     </dependencies>
 
     <build>
-        <finalName>${project.artifactId}-${suffixId}-${project.version}</finalName>
+        <finalName>${project.artifactId}-${spark.version}-${project.version}</finalName>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -230,7 +230,6 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <suffixId>1_6</suffixId>
                 <spark.version>1.6.1</spark.version>
                 <java.version>1.8</java.version>
             </properties>
@@ -238,7 +237,6 @@
         <profile>
             <id>quickstart</id>
             <properties>
-                <suffixId>1_5</suffixId>
                 <spark.version>1.5.0-cdh5.5.0</spark.version>
                 <spark.scope>provided</spark.scope>
                 <java.version>1.7</java.version>
