@@ -29,6 +29,7 @@ Update (Jan 7 2016) - for Polylines and Polygons, I'm mimicking the core Spark V
 This project build process is based on [Apache Maven](https://maven.apache.org/)
 
 ```bash
+export SPARK_LOCAL_IP=localhost
 mvn install
 ```
 
@@ -42,7 +43,7 @@ In the case of the `Points` feature class, the x/y coordinate values should matc
 ## Using with Spark shell
 
 ```bash
-$SPARK_HOME/bin/spark-shell --packages com.esri:spark-gdb:0.3
+$SPARK_HOME/bin/spark-shell --packages com.esri:spark-gdb:0.7
 ```
 
 ```scala
@@ -168,7 +169,7 @@ hadoop fs -put /Users/<YOUR_PATH>/spark-gdb/src/test/resources/Test.gdb /data
 
 Start A Spark shell:
 ```bash
-spark-shell --jars /Users/<YOUR_PATH>/spark-gdb/target/spark-gdb-0.3.jar
+spark-shell --jars /Users/<YOUR_PATH>/spark-gdb/target/spark-gdb-0.7.jar
 ```
 
 Submit a Spark Context job:

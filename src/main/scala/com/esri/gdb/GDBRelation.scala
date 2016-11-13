@@ -8,7 +8,9 @@ import org.apache.spark.sql.{Row, SQLContext}
 
 /**
   */
-case class GDBRelation(gdbPath: String, gdbName: String, numPartition: Int)(@transient val sqlContext: SQLContext) extends BaseRelation with Logging with TableScan {
+case class GDBRelation(gdbPath: String, gdbName: String, numPartition: Int)
+                      (@transient val sqlContext: SQLContext)
+  extends BaseRelation with Logging with TableScan {
 
   override val schema = inferSchema()
 

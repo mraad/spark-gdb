@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.esri</groupId>
-    <artifactId>spark-gdb_${spark.version}</artifactId>
-    <version>0.6</version>
+    <artifactId>spark-gdb</artifactId>
+    <version>0.7</version>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <scala.compact.version>2.10</scala.compact.version>
-        <scala.version>2.10.5</scala.version>
+        <scala.compact>2.10</scala.compact>
+        <scala.version>${scala.compact}.6</scala.version>
     </properties>
 
     <repositories>
@@ -54,22 +54,24 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--
+                <dependency>
+                    <groupId>org.apache.spark</groupId>
+                    <artifactId>spark-core_${scala.compact}</artifactId>
+                    <version>${spark.version}</version>
+                    <scope>${spark.scope}</scope>
+                </dependency>
+        -->
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_${scala.compact.version}</artifactId>
-            <version>${spark.version}</version>
-            <scope>${spark.scope}</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_${scala.compact.version}</artifactId>
+            <artifactId>spark-sql_${scala.compact}</artifactId>
             <version>${spark.version}</version>
             <scope>${spark.scope}</scope>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
-            <version>2.9.1</version>
+            <version>2.9.4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -80,13 +82,13 @@
         </dependency>
         <dependency>
             <groupId>com.jsuereth</groupId>
-            <artifactId>scala-arm_${scala.compact.version}</artifactId>
+            <artifactId>scala-arm_${scala.compact}</artifactId>
             <version>1.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.scalatest</groupId>
-            <artifactId>scalatest_${scala.compact.version}</artifactId>
+            <artifactId>scalatest_${scala.compact}</artifactId>
             <version>2.2.6</version>
             <scope>test</scope>
         </dependency>
@@ -127,7 +129,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <scalaCompatVersion>${scala.compact.version}</scalaCompatVersion>
+                    <scalaCompatVersion>${scala.compact}</scalaCompatVersion>
                     <scalaVersion>${scala.version}</scalaVersion>
                     <recompileMode>incremental</recompileMode>
                     <useZincServer>false</useZincServer>
@@ -136,7 +138,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.5.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -145,7 +147,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.7</version>
+                <version>2.19.1</version>
                 <configuration>
                     <skipTests>true</skipTests>
                 </configuration>
@@ -212,35 +214,37 @@
 
     <profiles>
         <profile>
-            <id>spark-provided</id>
+            <id>spark-1.6</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <spark.scope>provided</spark.scope>
+                <spark.version>1.6.2</spark.version>
+                <java.version>1.8</java.version>
             </properties>
         </profile>
         <profile>
-            <id>spark-idea</id>
+            <id>spark-1.4</id>
+            <properties>
+                <spark.scope>provided</spark.scope>
+                <spark.version>1.4.1</spark.version>
+                <java.version>1.7</java.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>intellij</id>
             <properties>
                 <spark.scope>compile</spark.scope>
-            </properties>
-        </profile>
-        <profile>
-            <id>spark-1.6.1</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <spark.version>1.6.1</spark.version>
+                <spark.version>1.6.2</spark.version>
                 <java.version>1.8</java.version>
             </properties>
         </profile>
         <profile>
             <id>quickstart</id>
             <properties>
-                <spark.version>1.5.0-cdh5.5.0</spark.version>
                 <spark.scope>provided</spark.scope>
+                <spark.version>1.5.0-cdh5.5.0</spark.version>
                 <java.version>1.7</java.version>
             </properties>
             <dependencies>

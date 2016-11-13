@@ -4,14 +4,14 @@ import com.esri.gdb.{GDBIndex, GDBTable}
 import resource._
 
 object GDBApp extends App {
-  val gdb = "/Volumes/SSD512G/TXData/2014/TXDOT_Roadway_Inventory.gdb"
+  val gdb = "/Users/mraad_admin/Share/VZ/OnlyHighways.gdb"
 
-  /// GDBTable.listTables(gdb).foreach(println)
+  GDBTable.listTables(gdb).foreach(println)
 
   doCat
 
   def doCat: Unit = {
-    GDBTable.findTable(gdb, "TXDOT_Roadway_Linework_Routed")
+    GDBTable.findTable(gdb, "Interstates")
       .foreach(catTab => {
         for {
           index <- managed(GDBIndex(gdb, catTab.hexName))
